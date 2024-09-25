@@ -1,0 +1,11 @@
+env: local
+
+rest:
+  port: 8081
+
+db:
+  host: localhost
+  port: 5432
+  username: song-library-service
+  database: song-library-service
+  password: test

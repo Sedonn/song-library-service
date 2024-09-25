@@ -1,0 +1,7 @@
+version: '3'
+
+tasks:
+  run:local:
+    desc: Запустить микросервис библиотеки песен с локальным окружением.
+    cmds:
+      - go run ./cmd/song-library/app.go --config_path="./config/local.yaml"
