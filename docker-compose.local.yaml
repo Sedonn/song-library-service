@@ -1,0 +1,14 @@
+version: '3'
+
+name: song-library-service-local
+
+services:
+  song-library-service-db:
+    extends:
+      file: docker-compose.common.yaml
+      service: postgresql
+
+    container_name: song-library-service-db-local
+    environment:
+      POSTGRES_USER: song-library-service
+      POSTGRES_PASSWORD: test

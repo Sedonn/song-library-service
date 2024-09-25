@@ -1,0 +1,9 @@
+version: '3'
+
+name: song-library-service-common
+
+services:
+  postgresql:
+    image: postgres:16.4
+    ports:
+      - 5432:5432

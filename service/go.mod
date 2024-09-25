@@ -1,6 +1,6 @@
 module github.com/sedonn/song-library-service
 
-go 1.22.2
+go 1.23.1
 
 require (
 	github.com/fatih/color v1.17.0
