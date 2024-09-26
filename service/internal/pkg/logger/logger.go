@@ -5,6 +5,8 @@ import (
 	"os"
 	"strings"
 
+	gormlog "gorm.io/gorm/logger"
+
 	"github.com/sedonn/song-library-service/internal/config"
 	"github.com/sedonn/song-library-service/internal/pkg/logger/handlers/prettyslog"
 )
@@ -22,6 +24,18 @@ func New(env string) *slog.Logger {
 	}
 
 	return log
+}
+
+// NewGORMLogger creates a instance of the gorm logger based on current environment.
+func NewGORMLogger(env string) gormlog.Interface {
+	var level gormlog.LogLevel
+
+	switch env {
+	case config.EnvLocal:
+		level = gormlog.Info
+	}
+
+	return gormlog.Default.LogMode(level)
 }
 
 // cutFunctionWithPackage вырезает название функции и ее пакет из slog.Source.Function.

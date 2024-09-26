@@ -9,33 +9,55 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
+	"github.com/go-playground/validator/v10"
 
+	"github.com/sedonn/song-library-service/internal/config"
 	"github.com/sedonn/song-library-service/internal/pkg/logger"
+	songrest "github.com/sedonn/song-library-service/internal/rest/handlers/song"
 	mwerror "github.com/sedonn/song-library-service/internal/rest/middleware/error"
+	"github.com/sedonn/song-library-service/internal/rest/validators"
 )
 
 // App это REST-сервер.
 type App struct {
 	log        *slog.Logger
 	httpServer *http.Server
-	port       int
+	cfg        *config.RESTConfig
 }
 
 // New создает новый REST-сервер.
-func New(log *slog.Logger, port int) *App {
+func New(log *slog.Logger, cfg *config.RESTConfig, s songrest.SongLibraryManager) *App {
 	router := gin.Default()
+
+	mustRegisterValidators()
 
 	router.Use(mwerror.New())
 
+	api := router.Group("api")
+	{
+		v1 := api.Group("/v1")
+		{
+			songrest.New(s).BindTo(v1)
+		}
+	}
+
 	srv := &http.Server{
-		Addr:    net.JoinHostPort("", strconv.Itoa(port)),
+		Addr:    net.JoinHostPort("", strconv.Itoa(cfg.Port)),
 		Handler: router.Handler(),
 	}
 
 	return &App{
 		log:        log,
 		httpServer: srv,
-		port:       port,
+		cfg:        cfg,
+	}
+}
+
+// mustRegisterValidators регистрирует кастомные методы валидации.
+func mustRegisterValidators() {
+	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
+		_ = v.RegisterValidation("songreleasedate", validators.SongReleaseDate)
 	}
 }
 
