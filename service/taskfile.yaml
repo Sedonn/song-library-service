@@ -5,3 +5,19 @@ tasks:
     desc: Запустить микросервис библиотеки песен с локальным окружением.
     cmds:
       - go run ./cmd/song-library/app.go --config_path="./config/local.yaml"
+
+  migrate:local:
+    desc: Выполнить миграции для базы данных с локальным окружением.
+    cmd: >
+      go run ./cmd/migrator/migrator.go
+      --config_path="./config/local.yaml"
+      --migrations_path="./migrations"
+      --verbose
+
+  atlas:gorm:
+    desc: Создать новые файлы миграций на основе текущего состояния GORM моделей.
+    cmd: atlas migrate diff {{.CLI_ARGS}} --env gorm
+
+  atlas:new:
+    desc: Создать новую пустую миграцию.
+    cmd: atlas migrate new --env custom {{.CLI_ARGS}}
