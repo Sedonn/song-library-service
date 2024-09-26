@@ -10,6 +10,7 @@ import (
 
 // SongCreator описывает поведение объекта, который добавляет новые песни.
 type SongCreator interface {
+	// CreateSong добавляют новую песню.
 	CreateSong(ctx context.Context, s models.Song) (uint64, error)
 }
 
@@ -26,7 +27,7 @@ type response struct {
 }
 
 // New возвращает новый объект хендлера, который добавляет новые песни.
-func New(m SongCreator) gin.HandlerFunc {
+func New(s SongCreator) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req request
 		if err := c.ShouldBindJSON(&req); err != nil {
@@ -34,7 +35,7 @@ func New(m SongCreator) gin.HandlerFunc {
 			return
 		}
 
-		id, err := m.CreateSong(c, models.Song{
+		id, err := s.CreateSong(c, models.Song{
 			Name:        req.Name,
 			Group:       req.Group,
 			ReleaseDate: req.ReleaseDate,

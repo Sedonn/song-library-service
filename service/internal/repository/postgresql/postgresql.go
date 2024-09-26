@@ -17,6 +17,7 @@ type Repository struct {
 	db *gorm.DB
 }
 
+var _ song.SongProvider = (*Repository)(nil)
 var _ song.SongSaver = (*Repository)(nil)
 
 // New создает новый объект репозитория.
