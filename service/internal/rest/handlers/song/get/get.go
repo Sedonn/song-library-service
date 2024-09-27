@@ -10,35 +10,32 @@ import (
 	"github.com/sedonn/song-library-service/internal/services"
 )
 
-// SongGetter описывает поведение объекта, который извлекает данные библиотеки песен.
+// SongGetter описывает поведение объекта слоя бизнес-логики, который извлекает данные библиотеки песен.
 type SongGetter interface {
+	// GetSong возвращает определенную песню.
 	GetSong(ctx context.Context, id uint64) (models.Song, error)
-}
-
-type request struct {
-	ID uint64 `uri:"id" binding:"required"`
 }
 
 // New возвращает новый объект хендлера, который возвращает определенную песню.
 func New(sg SongGetter) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		var req request
-		if err := c.ShouldBindUri(&req); err != nil {
-			c.AbortWithError(http.StatusBadRequest, err)
+	return func(ctx *gin.Context) {
+		var req models.SongIDAPI
+		if err := ctx.ShouldBindUri(&req); err != nil {
+			ctx.AbortWithError(http.StatusBadRequest, err)
 			return
 		}
 
-		s, err := sg.GetSong(c, req.ID)
+		s, err := sg.GetSong(ctx, req.ID)
 		if err != nil {
 			if errors.Is(err, services.ErrSongNotFound) {
-				c.AbortWithError(http.StatusBadRequest, err)
+				ctx.AbortWithError(http.StatusBadRequest, err)
 				return
 			}
 
-			c.AbortWithError(http.StatusInternalServerError, err)
+			ctx.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
 
-		c.JSON(http.StatusOK, s)
+		ctx.JSON(http.StatusOK, s)
 	}
 }

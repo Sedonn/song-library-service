@@ -3,6 +3,7 @@ package songrest
 import (
 	"github.com/gin-gonic/gin"
 
+	"github.com/sedonn/song-library-service/internal/rest/handlers/song/change"
 	"github.com/sedonn/song-library-service/internal/rest/handlers/song/create"
 	"github.com/sedonn/song-library-service/internal/rest/handlers/song/get"
 )
@@ -11,6 +12,7 @@ import (
 type SongLibraryManager interface {
 	create.SongCreator
 	get.SongGetter
+	change.SongChanger
 }
 
 // Handler это корневой хендлер библиотеки песен.
@@ -31,5 +33,6 @@ func (h *Handler) BindTo(router *gin.RouterGroup) {
 	{
 		songLibrary.GET("/:id", get.New(h.songLibraryManager))
 		songLibrary.POST("/", create.New(h.songLibraryManager))
+		songLibrary.PUT("/:id", change.New(h.songLibraryManager))
 	}
 }

@@ -22,7 +22,7 @@ func New(log *slog.Logger, cfg *config.Config) *App {
 	}
 	log.Info("database connected", slog.String("database", cfg.DB.Database))
 
-	songLibraryService := song.New(log, repository, repository)
+	songLibraryService := song.New(log, repository, repository, repository)
 
 	restApp := restapp.New(log, &cfg.REST, songLibraryService)
 

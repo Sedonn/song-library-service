@@ -8,3 +8,23 @@ type Song struct {
 	Text        string `gorm:"column:text;type:text"`
 	Link        string `gorm:"column:link;size:150"`
 }
+
+type SongIDAPI struct {
+	ID uint64 `uri:"id" binding:"required"`
+}
+
+type SongAttributesAPI struct {
+	Name        string `json:"name" binding:"required,lte=130"`
+	Group       string `json:"group" binding:"required,lte=130"`
+	ReleaseDate string `json:"releaseDate" binding:"required,songreleasedate"`
+	Text        string `json:"text" binding:"required"`
+	Link        string `json:"link" binding:"required,url"`
+}
+
+type SongOptionalAttributesAPI struct {
+	Name        string `json:"name" binding:"omitempty,lte=130"`
+	Group       string `json:"group" binding:"omitempty,lte=130"`
+	ReleaseDate string `json:"releaseDate" binding:"omitempty,songreleasedate"`
+	Text        string `json:"text" binding:"omitempty"`
+	Link        string `json:"link" binding:"omitempty,url"`
+}
