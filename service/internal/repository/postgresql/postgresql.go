@@ -20,6 +20,9 @@ type Repository struct {
 var _ song.SongProvider = (*Repository)(nil)
 var _ song.SongSaver = (*Repository)(nil)
 
+var _ song.SongUpdater = (*Repository)(nil)
+var _ song.SongDeleter = (*Repository)(nil)
+
 // New создает новый объект репозитория.
 func New(cfg *config.Config) (*Repository, error) {
 	dsn := makeDSN(&cfg.DB)

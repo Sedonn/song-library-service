@@ -6,6 +6,7 @@ import (
 	"github.com/sedonn/song-library-service/internal/rest/handlers/song/change"
 	"github.com/sedonn/song-library-service/internal/rest/handlers/song/create"
 	"github.com/sedonn/song-library-service/internal/rest/handlers/song/get"
+	"github.com/sedonn/song-library-service/internal/rest/handlers/song/remove"
 )
 
 // SongLibraryManager описывает поведение объекта, который обеспечивает бизнес-логику работы с библиотекой песен.
@@ -13,6 +14,7 @@ type SongLibraryManager interface {
 	create.SongCreator
 	get.SongGetter
 	change.SongChanger
+	remove.SongRemover
 }
 
 // Handler это корневой хендлер библиотеки песен.
@@ -34,5 +36,6 @@ func (h *Handler) BindTo(router *gin.RouterGroup) {
 		songLibrary.GET("/:id", get.New(h.songLibraryManager))
 		songLibrary.POST("/", create.New(h.songLibraryManager))
 		songLibrary.PUT("/:id", change.New(h.songLibraryManager))
+		songLibrary.DELETE("/:id", remove.New(h.songLibraryManager))
 	}
 }

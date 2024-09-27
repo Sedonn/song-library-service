@@ -19,7 +19,7 @@ type createSongResponse struct {
 }
 
 // New возвращает новый объект хендлера, который добавляет новые песни.
-func New(s SongCreator) gin.HandlerFunc {
+func New(sc SongCreator) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req models.SongAttributesAPI
 		if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -27,7 +27,7 @@ func New(s SongCreator) gin.HandlerFunc {
 			return
 		}
 
-		id, err := s.CreateSong(ctx, models.Song{
+		id, err := sc.CreateSong(ctx, models.Song{
 			Name:        req.Name,
 			Group:       req.Group,
 			ReleaseDate: req.ReleaseDate,

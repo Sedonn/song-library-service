@@ -30,23 +30,31 @@ type SongUpdater interface {
 	UpdateSong(ctx context.Context, s models.Song) (models.Song, error)
 }
 
-// Message предоставляет бизнес-логику работы с библиотекой песен.
+// SongDeleter описывает поведение объекта слоя данных, который обеспечивает удаление данных песен.
+type SongDeleter interface {
+	// DeleteSong удаляет данные определенной песни.
+	DeleteSong(ctx context.Context, s models.Song) (uint64, error)
+}
+
+// SongLibrary предоставляет бизнес-логику работы с библиотекой песен.
 type SongLibrary struct {
 	log          *slog.Logger
 	songProvider SongProvider
 	songSaver    SongSaver
 	songUpdater  SongUpdater
+	songDeleter  SongDeleter
 }
 
 var _ songrest.SongLibraryManager = (*SongLibrary)(nil)
 
 // New создает новый сервис для работы с сообщениями.
-func New(log *slog.Logger, sp SongProvider, ss SongSaver, su SongUpdater) *SongLibrary {
+func New(log *slog.Logger, sp SongProvider, ss SongSaver, su SongUpdater, sd SongDeleter) *SongLibrary {
 	return &SongLibrary{
 		log:          log,
 		songProvider: sp,
 		songSaver:    ss,
 		songUpdater:  su,
+		songDeleter:  sd,
 	}
 }
 
@@ -114,4 +122,28 @@ func (sl *SongLibrary) ChangeSong(ctx context.Context, s models.Song) (models.So
 	log.Info("success to change song")
 
 	return s, nil
+}
+
+// RemoveSong удаляет определенную песню.
+func (sl *SongLibrary) RemoveSong(ctx context.Context, s models.Song) (uint64, error) {
+	log := sl.log.With(slog.Uint64("id", s.ID))
+
+	log.Info("attempt to remove song")
+
+	id, err := sl.songDeleter.DeleteSong(ctx, s)
+	if err != nil {
+		if errors.Is(err, repository.ErrSongNotFound) {
+			log.Warn("failed to remove song", logger.ErrorString(err))
+
+			return 0, services.ErrSongNotFound
+		}
+
+		log.Error("failed to remove song", logger.ErrorString(err))
+
+		return 0, err
+	}
+
+	log.Info("success to remove song")
+
+	return id, nil
 }
