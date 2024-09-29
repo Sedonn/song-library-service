@@ -16,10 +16,6 @@ type SongRemover interface {
 	RemoveSong(ctx context.Context, s models.Song) (uint64, error)
 }
 
-type removeSongResponse struct {
-	ID uint64 `json:"id"`
-}
-
 // New возвращает новый объект хендлера, который удаляет определенные песни.
 func New(sr SongRemover) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -40,6 +36,6 @@ func New(sr SongRemover) gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(http.StatusOK, removeSongResponse{ID: id})
+		ctx.JSON(http.StatusOK, models.SongIDAPI{ID: id})
 	}
 }

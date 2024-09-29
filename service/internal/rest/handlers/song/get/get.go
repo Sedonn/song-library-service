@@ -16,7 +16,7 @@ type SongGetter interface {
 	GetSong(ctx context.Context, id uint64) (models.Song, error)
 	// SearchSongs выполняет поиск песен по определенным параметрам.
 	// Поиск выполняется по подстроке каждого указанного поля.
-	SearchSongs(ctx context.Context, attrs models.Song) ([]models.Song, error)
+	SearchSongs(ctx context.Context, attrs models.Song, p models.PaginationAPI) (models.SongsAPI, error)
 }
 
 // NewGetHandler возвращает новый объект хендлера, который возвращает определенную песню.

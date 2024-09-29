@@ -14,10 +14,6 @@ type SongCreator interface {
 	CreateSong(ctx context.Context, s models.Song) (uint64, error)
 }
 
-type createSongResponse struct {
-	ID uint64 `json:"id"`
-}
-
 // New возвращает новый объект хендлера, который добавляет новые песни.
 func New(sc SongCreator) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -39,6 +35,6 @@ func New(sc SongCreator) gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(http.StatusOK, createSongResponse{ID: id})
+		ctx.JSON(http.StatusOK, models.SongIDAPI{ID: id})
 	}
 }

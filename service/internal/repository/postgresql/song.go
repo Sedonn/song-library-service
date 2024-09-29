@@ -3,6 +3,7 @@ package postgresql
 import (
 	"context"
 	"errors"
+	"math"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -14,8 +15,8 @@ import (
 // Song возвращает данные определенной песни.
 func (r *Repository) Song(ctx context.Context, id uint64) (models.Song, error) {
 	var s models.Song
-	if tx := r.db.WithContext(ctx).Take(&s, id); tx.Error != nil {
-		if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
+	if err := r.db.WithContext(ctx).Take(&s, id).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return models.Song{}, repository.ErrSongNotFound
 		}
 	}
@@ -24,24 +25,39 @@ func (r *Repository) Song(ctx context.Context, id uint64) (models.Song, error) {
 }
 
 // SearchSongs выполняет поиск песен по определенным параметрам.
-func (r *Repository) Songs(ctx context.Context, attrs models.Song) ([]models.Song, error) {
-	var songs []models.Song
+func (r *Repository) Songs(ctx context.Context, attrs models.Song, p models.PaginationAPI) (models.SongsAPI, error) {
+	var (
+		songs []models.SongAPI
+		count int64
+	)
 
-	tx := r.db.
+	err := r.db.
 		WithContext(ctx).
+		Model(models.Song{}).
 		Scopes(withSearchByStringAttributes(attrs)).
-		Find(&songs)
-	if tx.Error != nil {
-		return nil, tx.Error
+		Count(&count).
+		Scopes(withPagination(p)).
+		Find(&songs).
+		Error
+	if err != nil {
+		return models.SongsAPI{}, err
 	}
 
-	return songs, nil
+	return models.SongsAPI{
+		Songs: songs,
+		Pagination: models.PaginationMetadataAPI{
+			CurrentPageNumber: p.PageNumber,
+			PageCount:         uint64(math.Ceil(float64(count) / float64(p.PageSize))),
+			RecordCount:       uint64(count),
+			PageSize:          p.PageSize,
+		},
+	}, nil
 }
 
 // SaveSong сохраняет данные новой песни.
 func (r *Repository) SaveSong(ctx context.Context, s models.Song) (uint64, error) {
-	if tx := r.db.WithContext(ctx).Create(&s); tx.Error != nil {
-		return 0, tx.Error
+	if err := r.db.WithContext(ctx).Create(&s).Error; err != nil {
+		return 0, err
 	}
 
 	return s.ID, nil

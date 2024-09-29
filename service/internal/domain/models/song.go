@@ -9,8 +9,18 @@ type Song struct {
 	Link        string `gorm:"column:link;size:150"`
 }
 
+type SongsAPI struct {
+	Songs      []SongAPI             `json:"songs"`
+	Pagination PaginationMetadataAPI `json:"pagination"`
+}
+
+type SongAPI struct {
+	SongIDAPI
+	SongAttributesAPI
+}
+
 type SongIDAPI struct {
-	ID uint64 `uri:"id" binding:"required"`
+	ID uint64 `uri:"id" json:"id" binding:"number,required"`
 }
 
 type SongAttributesAPI struct {

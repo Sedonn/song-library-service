@@ -3,7 +3,6 @@ package logger
 import (
 	"log/slog"
 	"os"
-	"strings"
 
 	gormlog "gorm.io/gorm/logger"
 
@@ -36,13 +35,4 @@ func NewGORMLogger(env string) gormlog.Interface {
 	}
 
 	return gormlog.Default.LogMode(level)
-}
-
-// cutFunctionWithPackage вырезает название функции и ее пакет из slog.Source.Function.
-func cutFunctionWithPackage(f string) string {
-	if i := strings.LastIndexByte(f, '/'); i != -1 {
-		return f[i+1:]
-	}
-
-	return f
 }

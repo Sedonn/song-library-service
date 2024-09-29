@@ -18,7 +18,7 @@ type SongChanger interface {
 
 type changeSongRequest struct {
 	models.SongIDAPI
-	Data models.SongOptionalAttributesAPI
+	Song models.SongOptionalAttributesAPI
 }
 
 // New возвращает новый объект хендлера, который обновляет существующие песни.
@@ -29,18 +29,18 @@ func New(sc SongChanger) gin.HandlerFunc {
 			ctx.AbortWithError(http.StatusBadRequest, err)
 			return
 		}
-		if err := ctx.ShouldBindJSON(&req.Data); err != nil {
+		if err := ctx.ShouldBindJSON(&req.Song); err != nil {
 			ctx.AbortWithError(http.StatusBadRequest, err)
 			return
 		}
 
 		s, err := sc.ChangeSong(ctx, models.Song{
 			ID:          req.ID,
-			Name:        req.Data.Name,
-			Group:       req.Data.Group,
-			ReleaseDate: req.Data.ReleaseDate,
-			Text:        req.Data.Text,
-			Link:        req.Data.Link,
+			Name:        req.Song.Name,
+			Group:       req.Song.Group,
+			ReleaseDate: req.Song.ReleaseDate,
+			Text:        req.Song.Text,
+			Link:        req.Song.Link,
 		})
 		if err != nil {
 			if errors.Is(err, services.ErrSongNotFound) {
