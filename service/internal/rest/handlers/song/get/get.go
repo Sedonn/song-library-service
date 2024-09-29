@@ -14,10 +14,13 @@ import (
 type SongGetter interface {
 	// GetSong возвращает определенную песню.
 	GetSong(ctx context.Context, id uint64) (models.Song, error)
+	// SearchSongs выполняет поиск песен по определенным параметрам.
+	// Поиск выполняется по подстроке каждого указанного поля.
+	SearchSongs(ctx context.Context, attrs models.Song) ([]models.Song, error)
 }
 
-// New возвращает новый объект хендлера, который возвращает определенную песню.
-func New(sg SongGetter) gin.HandlerFunc {
+// NewGetHandler возвращает новый объект хендлера, который возвращает определенную песню.
+func NewGetHandler(sg SongGetter) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req models.SongIDAPI
 		if err := ctx.ShouldBindUri(&req); err != nil {

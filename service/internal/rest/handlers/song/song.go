@@ -31,9 +31,10 @@ func New(m SongLibraryManager) *Handler {
 
 // BindTo привязывает хендлер к определенной группе маршрутов.
 func (h *Handler) BindTo(router *gin.RouterGroup) {
-	songLibrary := router.Group("/song")
+	songLibrary := router.Group("/songs")
 	{
-		songLibrary.GET("/:id", get.New(h.songLibraryManager))
+		songLibrary.GET("/:id", get.NewGetHandler(h.songLibraryManager))
+		songLibrary.GET("/", get.NewSearchHandler(h.songLibraryManager))
 		songLibrary.POST("/", create.New(h.songLibraryManager))
 		songLibrary.PUT("/:id", change.New(h.songLibraryManager))
 		songLibrary.DELETE("/:id", remove.New(h.songLibraryManager))

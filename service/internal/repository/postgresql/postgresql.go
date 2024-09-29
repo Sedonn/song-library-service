@@ -2,9 +2,11 @@ package postgresql
 
 import (
 	"fmt"
+	"reflect"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/schema"
 
 	"github.com/sedonn/song-library-service/internal/config"
 	"github.com/sedonn/song-library-service/internal/domain/models"
@@ -42,6 +44,31 @@ func New(cfg *config.Config) (*Repository, error) {
 func paginate(p models.Pagination) func(*gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
 		return db.Limit(int(p.PageSize)).Offset(int(p.PageNumber-1) * int(p.PageSize))
+	}
+}
+
+// withSearchByStringAttributes добавляет поиск по подстроке для всех указанных строковых атрибутов модели.
+func withSearchByStringAttributes(model any) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		mType := reflect.TypeOf(model)
+		mValue := reflect.ValueOf(model)
+
+		for i := range mType.NumField() {
+			field := mType.Field(i)
+			if field.Type.Kind() != reflect.String {
+				continue
+			}
+
+			fieldValue := mValue.Field(i).String()
+			if fieldValue == "" {
+				continue
+			}
+
+			column := schema.ParseTagSetting(field.Tag.Get("gorm"), ";")["COLUMN"]
+			db.Where(fmt.Sprintf("%q ILIKE '%%%s%%'", column, fieldValue))
+		}
+
+		return db
 	}
 }
 

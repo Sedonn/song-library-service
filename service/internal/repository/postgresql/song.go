@@ -23,6 +23,21 @@ func (r *Repository) Song(ctx context.Context, id uint64) (models.Song, error) {
 	return s, nil
 }
 
+// SearchSongs выполняет поиск песен по определенным параметрам.
+func (r *Repository) Songs(ctx context.Context, attrs models.Song) ([]models.Song, error) {
+	var songs []models.Song
+
+	tx := r.db.
+		WithContext(ctx).
+		Scopes(withSearchByStringAttributes(attrs)).
+		Find(&songs)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+
+	return songs, nil
+}
+
 // SaveSong сохраняет данные новой песни.
 func (r *Repository) SaveSong(ctx context.Context, s models.Song) (uint64, error) {
 	if tx := r.db.WithContext(ctx).Create(&s); tx.Error != nil {

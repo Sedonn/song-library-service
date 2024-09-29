@@ -16,6 +16,8 @@ import (
 type SongProvider interface {
 	// Song возвращает данные определенной песни.
 	Song(ctx context.Context, id uint64) (models.Song, error)
+	// Songs выполняет поиск песен по определенным параметрам.
+	Songs(ctx context.Context, attrs models.Song) ([]models.Song, error)
 }
 
 // SongSaver описывает поведение объекта слоя данных, который обеспечивает сохранение данных песен.
@@ -80,6 +82,22 @@ func (sl SongLibrary) GetSong(ctx context.Context, id uint64) (models.Song, erro
 	log.Info("success to get song", slog.String("name", s.Name), slog.String("group", s.Group))
 
 	return s, nil
+}
+
+// SearchSongs выполняет поиск песен по определенным параметрам.
+func (sl *SongLibrary) SearchSongs(ctx context.Context, attrs models.Song) ([]models.Song, error) {
+	sl.log.Info("attempt to search songs")
+
+	songs, err := sl.songProvider.Songs(ctx, attrs)
+	if err != nil {
+		sl.log.Error("failed to search songs", logger.ErrorString(err))
+
+		return nil, err
+	}
+
+	sl.log.Info("success to search songs", slog.Int("count", len(songs)))
+
+	return songs, nil
 }
 
 // CreateSong создает новую песню.
