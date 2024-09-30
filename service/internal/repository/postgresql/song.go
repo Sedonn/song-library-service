@@ -70,7 +70,7 @@ func (r *Repository) UpdateSong(ctx context.Context, s models.Song) (models.Song
 
 // DeleteSong удаляет данные определенной песни.
 func (r *Repository) DeleteSong(ctx context.Context, s models.Song) (models.Song, error) {
-	tx := r.db.WithContext(ctx).Delete(&s)
+	tx := r.db.WithContext(ctx).Clauses(clause.Returning{}).Delete(&s)
 	if tx.Error != nil {
 		return models.Song{}, tx.Error
 	}
