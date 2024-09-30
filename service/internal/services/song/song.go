@@ -27,7 +27,7 @@ type SongProvider interface {
 
 // SongSaver описывает поведение объекта слоя данных, который обеспечивает сохранение данных песен.
 type SongSaver interface {
-	// SaveSong сохраняет данные нового сообщения.
+	// SaveSong сохраняет данные новой песни.
 	SaveSong(ctx context.Context, s models.Song) (models.Song, error)
 }
 
@@ -58,7 +58,7 @@ type SongLibrary struct {
 
 var _ songrest.SongLibraryManager = (*SongLibrary)(nil)
 
-// New создает новый сервис для работы с сообщениями.
+// New создает новый объект библиотеки песен.
 func New(log *slog.Logger, sp SongProvider, ss SongSaver, su SongUpdater, sd SongDeleter) *SongLibrary {
 	return &SongLibrary{
 		log:          log,
