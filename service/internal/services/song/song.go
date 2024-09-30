@@ -14,8 +14,8 @@ import (
 
 // SongSaver описывает поведение объекта слоя данных, который обеспечивает предоставление данных о песнях.
 type SongProvider interface {
-	// Song возвращает данные определенной песни.
-	Song(ctx context.Context, id uint64) (models.Song, error)
+	// SongWithCoupletPagination возвращает определенную песню с пагинацией по куплетам.
+	SongWithCoupletPagination(ctx context.Context, id uint64, p models.PaginationAPI) (models.SongWithCoupletPaginationAPI, error)
 	// Songs выполняет поиск песен по определенным параметрам.
 	Songs(ctx context.Context, attrs models.Song, p models.PaginationAPI) (models.SongsAPI, error)
 }
@@ -60,26 +60,30 @@ func New(log *slog.Logger, sp SongProvider, ss SongSaver, su SongUpdater, sd Son
 	}
 }
 
-// GetSong возвращает данные определенной песни.
-func (sl SongLibrary) GetSong(ctx context.Context, id uint64) (models.Song, error) {
+// GetSongWithCoupletPagination возвращает определенную песню с пагинацией по куплетам.
+func (sl *SongLibrary) GetSongWithCoupletPagination(ctx context.Context, id uint64, p models.PaginationAPI) (models.SongWithCoupletPaginationAPI, error) {
 	log := sl.log.With(slog.Uint64("id", id))
 
 	log.Info("attempt to get song")
 
-	s, err := sl.songProvider.Song(ctx, id)
+	s, err := sl.songProvider.SongWithCoupletPagination(ctx, id, p)
 	if err != nil {
-		if errors.Is(err, repository.ErrSongNotFound) {
+		switch {
+		case errors.Is(err, repository.ErrSongNotFound):
 			log.Warn("failed to provide song", logger.ErrorString(err))
+			return models.SongWithCoupletPaginationAPI{}, services.ErrSongNotFound
 
-			return models.Song{}, services.ErrSongNotFound
+		case errors.Is(err, repository.ErrPageNumberOutOfRange):
+			log.Warn("failed to paginate song couplets", logger.ErrorString(err))
+			return models.SongWithCoupletPaginationAPI{}, services.ErrPageNumberOutOfRange
+
+		default:
+			log.Error("failed to get song", logger.ErrorString(err))
+			return models.SongWithCoupletPaginationAPI{}, err
 		}
-
-		log.Error("failed to get song", logger.ErrorString(err))
-
-		return models.Song{}, err
 	}
 
-	log.Info("success to get song", slog.String("name", s.Name), slog.String("group", s.Group))
+	log.Info("success to get song", slog.Uint64("id", s.Song.ID))
 
 	return s, nil
 }

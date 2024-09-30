@@ -14,6 +14,11 @@ type SongsAPI struct {
 	Pagination PaginationMetadataAPI `json:"pagination"`
 }
 
+type SongWithCoupletPaginationAPI struct {
+	Song       SongAPI               `json:"song"`
+	Pagination PaginationMetadataAPI `json:"pagination"`
+}
+
 type SongAPI struct {
 	SongIDAPI
 	SongAttributesAPI

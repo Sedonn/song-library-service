@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"math"
+	"strings"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -12,16 +13,31 @@ import (
 	"github.com/sedonn/song-library-service/internal/repository"
 )
 
-// Song возвращает данные определенной песни.
-func (r *Repository) Song(ctx context.Context, id uint64) (models.Song, error) {
-	var s models.Song
-	if err := r.db.WithContext(ctx).Take(&s, id).Error; err != nil {
+// SongWithCoupletPagination возвращает определенную песню с пагинацией по куплетам.
+func (r *Repository) SongWithCoupletPagination(ctx context.Context, id uint64, p models.PaginationAPI) (models.SongWithCoupletPaginationAPI, error) {
+	var s models.SongAPI
+	if err := r.db.WithContext(ctx).Model(models.Song{}).Take(&s, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return models.Song{}, repository.ErrSongNotFound
+			return models.SongWithCoupletPaginationAPI{}, repository.ErrSongNotFound
 		}
 	}
 
-	return s, nil
+	couplets := strings.Split(s.Text, "\n\n")
+	if len(couplets) < int(p.PageNumber) {
+		return models.SongWithCoupletPaginationAPI{}, repository.ErrPageNumberOutOfRange
+	}
+
+	s.Text = couplets[p.PageNumber-1]
+
+	return models.SongWithCoupletPaginationAPI{
+		Song: s,
+		Pagination: models.PaginationMetadataAPI{
+			CurrentPageNumber: p.PageNumber,
+			PageCount:         uint64(len(couplets)),
+			PageSize:          1,
+			RecordCount:       uint64(len(couplets)),
+		},
+	}, nil
 }
 
 // SearchSongs выполняет поиск песен по определенным параметрам.
