@@ -1,8 +1,0 @@
-basePath: /api/v1
-info:
-  contact: {}
-  description: Микросервис библиотеки песен.
-  title: Song-library-service
-  version: 1.0.0
-paths: {}
-swagger: "2.0"
