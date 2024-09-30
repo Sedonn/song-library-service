@@ -18,9 +18,20 @@
 task docker:compose-local
 ```
 
-2. Запуск микросервиса.
+2. Переход в папку сервиса.
 
 ```shell
 сd service
+```
+
+3. Запуск миграций.
+
+```shell
+task migrate:local
+```
+
+4. Запуск микросервиса.
+
+```shell
 task run:local
 ```
