@@ -14,7 +14,9 @@ import (
 	"github.com/sedonn/song-library-service/internal/services"
 )
 
-// SongSaver описывает поведение объекта слоя данных, который обеспечивает предоставление данных о песнях.
+// SongProvider описывает поведение объекта слоя данных, который обеспечивает предоставление данных о песнях.
+//
+//go:generate go run github.com/vektra/mockery/v2@v2.46.1 --name=SongProvider
 type SongProvider interface {
 	// Song возвращает данные определенной песни.
 	Song(ctx context.Context, id uint64) (models.Song, error)
@@ -30,12 +32,16 @@ type SongSaver interface {
 }
 
 // SongUpdater описывает поведение объекта слоя данных, который обеспечивает обновление данных песен.
+//
+//go:generate go run github.com/vektra/mockery/v2@v2.46.1 --name=SongUpdater
 type SongUpdater interface {
 	// UpdateSong обновляет данные определенной песни.
 	UpdateSong(ctx context.Context, s models.Song) (models.Song, error)
 }
 
 // SongDeleter описывает поведение объекта слоя данных, который обеспечивает удаление данных песен.
+//
+//go:generate go run github.com/vektra/mockery/v2@v2.46.1 --name=SongDeleter
 type SongDeleter interface {
 	// DeleteSong удаляет данные определенной песни.
 	DeleteSong(ctx context.Context, s models.Song) (models.Song, error)

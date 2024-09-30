@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"io"
 	"log/slog"
 	"os"
 
@@ -25,7 +26,12 @@ func New(env string) *slog.Logger {
 	return log
 }
 
-// NewGORMLogger creates a instance of the gorm logger based on current environment.
+// NewDiscardLogger создает заглушку-логгер, в которой отсутствует вывод логов.
+func NewDiscardLogger() *slog.Logger {
+	return slog.New(slog.NewTextHandler(io.Discard, &slog.HandlerOptions{}))
+}
+
+// NewGORMLogger создает и настраивает логгер GORM.
 func NewGORMLogger(env string) gormlog.Interface {
 	var level gormlog.LogLevel
 
