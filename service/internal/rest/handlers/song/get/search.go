@@ -17,6 +17,18 @@ type searchSongRequest struct {
 }
 
 // NewGetHandler возвращает новый объект хендлера, который выполняет поиск песен по определенным параметрам.
+//
+//	@Summary		Поиск определенной песни.
+//	@Description	Поиск определенной песни по всем атрибутам.
+//	@Tags			song-library
+//	@Accept			json
+//	@Produce		json
+//	@Param			song	query		searchSongRequest	true	"Настройки поиска."
+//	@Param			song	query		models.Pagination	true	"Настройки пагинации поиска."
+//	@Success		200		{object}	models.SongWithCoupletPaginationAPI
+//	@Failure		400		{object}	mwerror.ErrorResponse
+//	@Failure		500		{object}	mwerror.ErrorResponse
+//	@Router			/songs/ [get]
 func NewSearchHandler(sg SongGetter) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req searchSongRequest

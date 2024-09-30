@@ -1,0 +1,278 @@
+basePath: /api/v1
+definitions:
+  models.Pagination:
+    properties:
+      pageNumber:
+        minimum: 1
+        type: integer
+      pageSize:
+        maximum: 100
+        minimum: 10
+        type: integer
+    type: object
+  models.PaginationMetadataAPI:
+    properties:
+      currentPageNumber:
+        type: integer
+      pageCount:
+        type: integer
+      pageSize:
+        type: integer
+      recordCount:
+        type: integer
+    type: object
+  models.SongAPI:
+    properties:
+      group:
+        maxLength: 130
+        type: string
+      id:
+        type: integer
+      link:
+        type: string
+      name:
+        maxLength: 130
+        type: string
+      releaseDate:
+        type: string
+      text:
+        type: string
+    required:
+    - group
+    - id
+    - link
+    - name
+    - releaseDate
+    - text
+    type: object
+  models.SongAttributesAPI:
+    properties:
+      group:
+        maxLength: 130
+        type: string
+      link:
+        type: string
+      name:
+        maxLength: 130
+        type: string
+      releaseDate:
+        type: string
+      text:
+        type: string
+    required:
+    - group
+    - link
+    - name
+    - releaseDate
+    - text
+    type: object
+  models.SongOptionalAttributesAPI:
+    properties:
+      group:
+        maxLength: 130
+        type: string
+      link:
+        type: string
+      name:
+        maxLength: 130
+        type: string
+      releaseDate:
+        type: string
+      text:
+        type: string
+    type: object
+  models.SongWithCoupletPaginationAPI:
+    properties:
+      pagination:
+        $ref: '#/definitions/models.PaginationMetadataAPI'
+      song:
+        $ref: '#/definitions/models.SongAPI'
+    type: object
+  mwerror.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: Микросервис библиотеки песен.
+  title: Song-library-service
+  version: 1.0.0
+paths:
+  /songs/:
+    get:
+      consumes:
+      - application/json
+      description: Поиск определенной песни по всем атрибутам.
+      parameters:
+      - in: query
+        name: group
+        type: string
+      - in: query
+        name: link
+        type: string
+      - in: query
+        name: name
+        type: string
+      - in: query
+        name: releaseDate
+        type: string
+      - in: query
+        name: text
+        type: string
+      - in: query
+        minimum: 1
+        name: pageNumber
+        type: integer
+      - in: query
+        maximum: 100
+        minimum: 10
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SongWithCoupletPaginationAPI'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/mwerror.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/mwerror.ErrorResponse'
+      summary: Поиск определенной песни.
+      tags:
+      - song-library
+    post:
+      consumes:
+      - application/json
+      description: Добавление новой песни. Для разделения куплетов необходимо использовать
+        '\n\n'.
+      parameters:
+      - description: Данные новой песни
+        in: body
+        name: song
+        required: true
+        schema:
+          $ref: '#/definitions/models.SongAttributesAPI'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SongAPI'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/mwerror.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/mwerror.ErrorResponse'
+      summary: Добавить новую песню.
+      tags:
+      - song-library
+  /songs/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Удалить данные существующей песни.
+      parameters:
+      - in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SongAPI'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/mwerror.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/mwerror.ErrorResponse'
+      summary: Удалить данные существующей песни.
+      tags:
+      - song-library
+    get:
+      consumes:
+      - application/json
+      description: Получить данные определенной песни с пагинацией по куплетами.
+      parameters:
+      - in: path
+        name: id
+        required: true
+        type: integer
+      - in: query
+        minimum: 1
+        name: pageNumber
+        type: integer
+      - in: query
+        maximum: 100
+        minimum: 10
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SongWithCoupletPaginationAPI'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/mwerror.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/mwerror.ErrorResponse'
+      summary: Получить данные определенной песни.
+      tags:
+      - song-library
+    put:
+      consumes:
+      - application/json
+      description: Изменить данные существующей песни. Для разделения куплетов необходимо
+        использовать '\n\n'.
+      parameters:
+      - in: path
+        name: id
+        required: true
+        type: integer
+      - description: Данные новой песни
+        in: body
+        name: song
+        required: true
+        schema:
+          $ref: '#/definitions/models.SongOptionalAttributesAPI'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SongAPI'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/mwerror.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/mwerror.ErrorResponse'
+      summary: Изменить данные существующей песни.
+      tags:
+      - song-library
+swagger: "2.0"

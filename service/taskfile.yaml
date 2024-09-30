@@ -21,3 +21,9 @@ tasks:
   atlas:new:
     desc: Создать новую пустую миграцию.
     cmd: atlas migrate new --env custom {{.CLI_ARGS}}
+
+  swagger:
+    desc: Сгенерировать Swagger-документацию.
+    cmds:
+      - swag fmt
+      - swag init -g ./cmd/song-library/app.go

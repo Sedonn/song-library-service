@@ -15,6 +15,7 @@ import (
 	"github.com/sedonn/song-library-service/internal/config"
 	"github.com/sedonn/song-library-service/internal/pkg/logger"
 	songrest "github.com/sedonn/song-library-service/internal/rest/handlers/song"
+	"github.com/sedonn/song-library-service/internal/rest/handlers/swagdocs"
 	mwerror "github.com/sedonn/song-library-service/internal/rest/middleware/error"
 	"github.com/sedonn/song-library-service/internal/rest/validators"
 )
@@ -41,6 +42,8 @@ func New(log *slog.Logger, cfg *config.RESTConfig, s songrest.SongLibraryManager
 			songrest.New(s).BindTo(v1)
 		}
 	}
+
+	swagdocs.BindTo(router)
 
 	srv := &http.Server{
 		Addr:    net.JoinHostPort("", strconv.Itoa(cfg.Port)),

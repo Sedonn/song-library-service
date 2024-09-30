@@ -11,6 +11,10 @@ import (
 	"github.com/sedonn/song-library-service/internal/pkg/logger"
 )
 
+//	@title			Song-library-service
+//	@version		1.0.0
+//	@description	Микросервис библиотеки песен.
+//	@BasePath		/api/v1
 func main() {
 	cfg := config.MustLoad()
 

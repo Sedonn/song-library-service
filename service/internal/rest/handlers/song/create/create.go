@@ -15,6 +15,17 @@ type SongCreator interface {
 }
 
 // New возвращает новый объект хендлера, который добавляет новые песни.
+//
+//	@Summary		Добавить новую песню.
+//	@Description	Добавление новой песни. Для разделения куплетов необходимо использовать '\n\n'.
+//	@Tags			song-library
+//	@Accept			json
+//	@Produce		json
+//	@Param			song	body		models.SongAttributesAPI	true	"Данные новой песни"
+//	@Success		200		{object}	models.SongAPI
+//	@Failure		400		{object}	mwerror.ErrorResponse
+//	@Failure		500		{object}	mwerror.ErrorResponse
+//	@Router			/songs/ [post]
 func New(sc SongCreator) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req models.SongAttributesAPI

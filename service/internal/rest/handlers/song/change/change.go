@@ -22,6 +22,18 @@ type changeSongRequest struct {
 }
 
 // New возвращает новый объект хендлера, который обновляет существующие песни.
+//
+//	@Summary		Изменить данные существующей песни.
+//	@Description	Изменить данные существующей песни. Для разделения куплетов необходимо использовать '\n\n'.
+//	@Tags			song-library
+//	@Accept			json
+//	@Produce		json
+//	@Param			song	path		models.SongIDAPI					true	"ID песни"
+//	@Param			song	body		models.SongOptionalAttributesAPI	true	"Данные новой песни"
+//	@Success		200		{object}	models.SongAPI
+//	@Failure		400		{object}	mwerror.ErrorResponse
+//	@Failure		500		{object}	mwerror.ErrorResponse
+//	@Router			/songs/{id} [put]
 func New(sc SongChanger) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req changeSongRequest

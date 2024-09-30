@@ -17,6 +17,17 @@ type SongRemover interface {
 }
 
 // New возвращает новый объект хендлера, который удаляет определенные песни.
+//
+//	@Summary		Удалить данные существующей песни.
+//	@Description	Удалить данные существующей песни.
+//	@Tags			song-library
+//	@Accept			json
+//	@Produce		json
+//	@Param			song	path		models.SongIDAPI	true	"ID песни"
+//	@Success		200		{object}	models.SongAPI
+//	@Failure		400		{object}	mwerror.ErrorResponse
+//	@Failure		500		{object}	mwerror.ErrorResponse
+//	@Router			/songs/{id} [delete]
 func New(sr SongRemover) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req models.SongIDAPI

@@ -1,0 +1,414 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Микросервис библиотеки песен.",
+        "title": "Song-library-service",
+        "contact": {},
+        "version": "1.0.0"
+    },
+    "basePath": "/api/v1",
+    "paths": {
+        "/songs/": {
+            "get": {
+                "description": "Поиск определенной песни по всем атрибутам.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "song-library"
+                ],
+                "summary": "Поиск определенной песни.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "group",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "link",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "releaseDate",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "text",
+                        "in": "query"
+                    },
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "name": "pageNumber",
+                        "in": "query"
+                    },
+                    {
+                        "maximum": 100,
+                        "minimum": 10,
+                        "type": "integer",
+                        "name": "pageSize",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.SongWithCoupletPaginationAPI"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/mwerror.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/mwerror.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Добавление новой песни. Для разделения куплетов необходимо использовать '\\n\\n'.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "song-library"
+                ],
+                "summary": "Добавить новую песню.",
+                "parameters": [
+                    {
+                        "description": "Данные новой песни",
+                        "name": "song",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.SongAttributesAPI"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.SongAPI"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/mwerror.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/mwerror.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/songs/{id}": {
+            "get": {
+                "description": "Получить данные определенной песни с пагинацией по куплетами.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "song-library"
+                ],
+                "summary": "Получить данные определенной песни.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "name": "pageNumber",
+                        "in": "query"
+                    },
+                    {
+                        "maximum": 100,
+                        "minimum": 10,
+                        "type": "integer",
+                        "name": "pageSize",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.SongWithCoupletPaginationAPI"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/mwerror.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/mwerror.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Изменить данные существующей песни. Для разделения куплетов необходимо использовать '\\n\\n'.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "song-library"
+                ],
+                "summary": "Изменить данные существующей песни.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Данные новой песни",
+                        "name": "song",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.SongOptionalAttributesAPI"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.SongAPI"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/mwerror.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/mwerror.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Удалить данные существующей песни.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "song-library"
+                ],
+                "summary": "Удалить данные существующей песни.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.SongAPI"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/mwerror.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/mwerror.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "models.Pagination": {
+            "type": "object",
+            "properties": {
+                "pageNumber": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "pageSize": {
+                    "type": "integer",
+                    "maximum": 100,
+                    "minimum": 10
+                }
+            }
+        },
+        "models.PaginationMetadataAPI": {
+            "type": "object",
+            "properties": {
+                "currentPageNumber": {
+                    "type": "integer"
+                },
+                "pageCount": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
+                },
+                "recordCount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.SongAPI": {
+            "type": "object",
+            "required": [
+                "group",
+                "id",
+                "link",
+                "name",
+                "releaseDate",
+                "text"
+            ],
+            "properties": {
+                "group": {
+                    "type": "string",
+                    "maxLength": 130
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "link": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 130
+                },
+                "releaseDate": {
+                    "type": "string"
+                },
+                "text": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.SongAttributesAPI": {
+            "type": "object",
+            "required": [
+                "group",
+                "link",
+                "name",
+                "releaseDate",
+                "text"
+            ],
+            "properties": {
+                "group": {
+                    "type": "string",
+                    "maxLength": 130
+                },
+                "link": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 130
+                },
+                "releaseDate": {
+                    "type": "string"
+                },
+                "text": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.SongOptionalAttributesAPI": {
+            "type": "object",
+            "properties": {
+                "group": {
+                    "type": "string",
+                    "maxLength": 130
+                },
+                "link": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 130
+                },
+                "releaseDate": {
+                    "type": "string"
+                },
+                "text": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.SongWithCoupletPaginationAPI": {
+            "type": "object",
+            "properties": {
+                "pagination": {
+                    "$ref": "#/definitions/models.PaginationMetadataAPI"
+                },
+                "song": {
+                    "$ref": "#/definitions/models.SongAPI"
+                }
+            }
+        },
+        "mwerror.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
