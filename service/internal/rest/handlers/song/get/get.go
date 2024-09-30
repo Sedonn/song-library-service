@@ -13,22 +13,23 @@ import (
 // SongGetter описывает поведение объекта слоя бизнес-логики, который извлекает данные библиотеки песен.
 type SongGetter interface {
 	// GetSongWithCoupletPagination возвращает определенную песню с пагинацией по куплетам.
-	GetSongWithCoupletPagination(ctx context.Context, id uint64, p models.PaginationAPI) (models.SongWithCoupletPaginationAPI, error)
+	// Текст разбивается на куплеты по \n\n символам.
+	GetSongWithCoupletPagination(ctx context.Context, id uint64, p models.Pagination) (models.SongWithCoupletPaginationAPI, error)
 	// SearchSongs выполняет поиск песен по определенным параметрам.
 	// Поиск выполняется по подстроке каждого указанного поля.
-	SearchSongs(ctx context.Context, attrs models.Song, p models.PaginationAPI) (models.SongsAPI, error)
+	SearchSongs(ctx context.Context, attrs models.Song, p models.Pagination) (models.SongsAPI, error)
 }
 
 type getSongRequest struct {
-	song       models.SongIDAPI
-	Pagination models.PaginationAPI
+	Song       models.SongIDAPI
+	Pagination models.Pagination
 }
 
 // NewGetHandler возвращает новый объект хендлера, который возвращает определенную песню.
 func NewGetHandler(sg SongGetter) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req getSongRequest
-		if err := ctx.ShouldBindUri(&req.song); err != nil {
+		if err := ctx.ShouldBindUri(&req.Song); err != nil {
 			ctx.AbortWithError(http.StatusBadRequest, err)
 			return
 		}
@@ -37,7 +38,7 @@ func NewGetHandler(sg SongGetter) gin.HandlerFunc {
 			return
 		}
 
-		s, err := sg.GetSongWithCoupletPagination(ctx, req.song.ID, req.Pagination)
+		s, err := sg.GetSongWithCoupletPagination(ctx, req.Song.ID, req.Pagination)
 		if err != nil {
 			switch {
 			case errors.Is(err, services.ErrSongNotFound):

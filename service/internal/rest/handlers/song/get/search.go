@@ -13,7 +13,7 @@ type searchSongRequest struct {
 	ReleaseDate string `form:"releaseDate"`
 	Text        string `form:"text"`
 	Link        string `form:"link"`
-	Pagination  models.PaginationAPI
+	Pagination  models.Pagination
 }
 
 // NewGetHandler возвращает новый объект хендлера, который выполняет поиск песен по определенным параметрам.

@@ -11,7 +11,7 @@ import (
 // SongCreator описывает поведение объекта слоя бизнес-логики, который добавляет новые песни.
 type SongCreator interface {
 	// CreateSong добавляют новую песню.
-	CreateSong(ctx context.Context, s models.Song) (uint64, error)
+	CreateSong(ctx context.Context, s models.Song) (models.SongAPI, error)
 }
 
 // New возвращает новый объект хендлера, который добавляет новые песни.
@@ -23,7 +23,7 @@ func New(sc SongCreator) gin.HandlerFunc {
 			return
 		}
 
-		id, err := sc.CreateSong(ctx, models.Song{
+		s, err := sc.CreateSong(ctx, models.Song{
 			Name:        req.Name,
 			Group:       req.Group,
 			ReleaseDate: req.ReleaseDate,
@@ -35,6 +35,6 @@ func New(sc SongCreator) gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(http.StatusOK, models.SongIDAPI{ID: id})
+		ctx.JSON(http.StatusOK, s)
 	}
 }

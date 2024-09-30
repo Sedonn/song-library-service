@@ -13,7 +13,7 @@ import (
 // SongRemover описывает поведение объекта слоя бизнес-логики, который удаляет песни.
 type SongRemover interface {
 	// RemoveSong удаляет определенную песню.
-	RemoveSong(ctx context.Context, s models.Song) (uint64, error)
+	RemoveSong(ctx context.Context, s models.Song) (models.SongAPI, error)
 }
 
 // New возвращает новый объект хендлера, который удаляет определенные песни.
@@ -25,7 +25,7 @@ func New(sr SongRemover) gin.HandlerFunc {
 			return
 		}
 
-		id, err := sr.RemoveSong(ctx, models.Song{ID: req.ID})
+		s, err := sr.RemoveSong(ctx, models.Song{ID: req.ID})
 		if err != nil {
 			if errors.Is(err, services.ErrSongNotFound) {
 				ctx.AbortWithError(http.StatusBadRequest, err)
@@ -36,6 +36,6 @@ func New(sr SongRemover) gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(http.StatusOK, models.SongIDAPI{ID: id})
+		ctx.JSON(http.StatusOK, s)
 	}
 }

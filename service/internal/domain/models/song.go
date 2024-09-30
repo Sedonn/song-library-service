@@ -9,6 +9,32 @@ type Song struct {
 	Link        string `gorm:"column:link;size:150"`
 }
 
+// API трансформирует модель БД в модель API.
+func (s *Song) API() SongAPI {
+	return SongAPI{
+		SongIDAPI: SongIDAPI{ID: s.ID},
+		SongAttributesAPI: SongAttributesAPI{
+			Name:        s.Name,
+			Group:       s.Group,
+			ReleaseDate: s.ReleaseDate,
+			Text:        s.Text,
+			Link:        s.Link,
+		},
+	}
+}
+
+type Songs []Song
+
+// API трансформирует слайс моделей БД в слайс моделей API.
+func (s *Songs) API() []SongAPI {
+	songsAPI := make([]SongAPI, len(*s))
+	for i, v := range *s {
+		songsAPI[i] = v.API()
+	}
+
+	return songsAPI
+}
+
 type SongsAPI struct {
 	Songs      []SongAPI             `json:"songs"`
 	Pagination PaginationMetadataAPI `json:"pagination"`

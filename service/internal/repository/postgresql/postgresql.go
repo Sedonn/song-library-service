@@ -41,7 +41,7 @@ func New(cfg *config.Config) (*Repository, error) {
 }
 
 // withPagination обеспечивает постраничную навигацию в результатах запроса.
-func withPagination(p models.PaginationAPI) func(*gorm.DB) *gorm.DB {
+func withPagination(p models.Pagination) func(*gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
 		return db.Limit(int(p.PageSize)).Offset(int(p.PageNumber-1) * int(p.PageSize))
 	}

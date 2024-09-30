@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"log/slog"
+	"math"
+	"strings"
 
 	"github.com/sedonn/song-library-service/internal/domain/models"
 	"github.com/sedonn/song-library-service/internal/pkg/logger"
@@ -14,16 +16,17 @@ import (
 
 // SongSaver описывает поведение объекта слоя данных, который обеспечивает предоставление данных о песнях.
 type SongProvider interface {
-	// SongWithCoupletPagination возвращает определенную песню с пагинацией по куплетам.
-	SongWithCoupletPagination(ctx context.Context, id uint64, p models.PaginationAPI) (models.SongWithCoupletPaginationAPI, error)
+	// Song возвращает данные определенной песни.
+	Song(ctx context.Context, id uint64) (models.Song, error)
 	// Songs выполняет поиск песен по определенным параметрам.
-	Songs(ctx context.Context, attrs models.Song, p models.PaginationAPI) (models.SongsAPI, error)
+	// Возвращает песни, общее количество найденных песен без учета пагинации, ошибку.
+	Songs(ctx context.Context, attrs models.Song, p models.Pagination) (models.Songs, uint64, error)
 }
 
 // SongSaver описывает поведение объекта слоя данных, который обеспечивает сохранение данных песен.
 type SongSaver interface {
 	// SaveSong сохраняет данные нового сообщения.
-	SaveSong(ctx context.Context, s models.Song) (uint64, error)
+	SaveSong(ctx context.Context, s models.Song) (models.Song, error)
 }
 
 // SongUpdater описывает поведение объекта слоя данных, который обеспечивает обновление данных песен.
@@ -35,7 +38,7 @@ type SongUpdater interface {
 // SongDeleter описывает поведение объекта слоя данных, который обеспечивает удаление данных песен.
 type SongDeleter interface {
 	// DeleteSong удаляет данные определенной песни.
-	DeleteSong(ctx context.Context, s models.Song) (uint64, error)
+	DeleteSong(ctx context.Context, s models.Song) (models.Song, error)
 }
 
 // SongLibrary предоставляет бизнес-логику работы с библиотекой песен.
@@ -61,69 +64,87 @@ func New(log *slog.Logger, sp SongProvider, ss SongSaver, su SongUpdater, sd Son
 }
 
 // GetSongWithCoupletPagination возвращает определенную песню с пагинацией по куплетам.
-func (sl *SongLibrary) GetSongWithCoupletPagination(ctx context.Context, id uint64, p models.PaginationAPI) (models.SongWithCoupletPaginationAPI, error) {
+// Текст разбивается на куплеты по \n\n символам.
+func (sl *SongLibrary) GetSongWithCoupletPagination(ctx context.Context, id uint64, p models.Pagination) (models.SongWithCoupletPaginationAPI, error) {
 	log := sl.log.With(slog.Uint64("id", id))
 
 	log.Info("attempt to get song")
 
-	s, err := sl.songProvider.SongWithCoupletPagination(ctx, id, p)
+	s, err := sl.songProvider.Song(ctx, id)
 	if err != nil {
-		switch {
-		case errors.Is(err, repository.ErrSongNotFound):
+		if errors.Is(err, repository.ErrSongNotFound) {
 			log.Warn("failed to provide song", logger.ErrorString(err))
+
 			return models.SongWithCoupletPaginationAPI{}, services.ErrSongNotFound
-
-		case errors.Is(err, repository.ErrPageNumberOutOfRange):
-			log.Warn("failed to paginate song couplets", logger.ErrorString(err))
-			return models.SongWithCoupletPaginationAPI{}, services.ErrPageNumberOutOfRange
-
-		default:
-			log.Error("failed to get song", logger.ErrorString(err))
-			return models.SongWithCoupletPaginationAPI{}, err
 		}
+
+		log.Error("failed to get song", logger.ErrorString(err))
+
+		return models.SongWithCoupletPaginationAPI{}, err
 	}
 
-	log.Info("success to get song", slog.Uint64("id", s.Song.ID))
+	couplets := strings.Split(s.Text, "\n\n")
+	if len(couplets) < int(p.PageNumber) {
+		return models.SongWithCoupletPaginationAPI{}, services.ErrPageNumberOutOfRange
+	}
 
-	return s, nil
+	s.Text = couplets[p.PageNumber-1]
+
+	return models.SongWithCoupletPaginationAPI{
+		Song: s.API(),
+		Pagination: models.PaginationMetadataAPI{
+			CurrentPageNumber: p.PageNumber,
+			PageCount:         uint64(len(couplets)),
+			PageSize:          1,
+			RecordCount:       uint64(len(couplets)),
+		},
+	}, nil
 }
 
 // SearchSongs выполняет поиск песен по определенным параметрам.
-func (sl *SongLibrary) SearchSongs(ctx context.Context, attrs models.Song, p models.PaginationAPI) (models.SongsAPI, error) {
+func (sl *SongLibrary) SearchSongs(ctx context.Context, attrs models.Song, p models.Pagination) (models.SongsAPI, error) {
 	sl.log.Info("attempt to search songs")
 
-	songs, err := sl.songProvider.Songs(ctx, attrs, p)
+	songs, total, err := sl.songProvider.Songs(ctx, attrs, p)
 	if err != nil {
 		sl.log.Error("failed to search songs", logger.ErrorString(err))
 
 		return models.SongsAPI{}, err
 	}
 
-	sl.log.Info("success to search songs", slog.Uint64("count", songs.Pagination.RecordCount))
+	sl.log.Info("success to search songs", slog.Uint64("total", total))
 
-	return songs, nil
+	return models.SongsAPI{
+		Songs: songs.API(),
+		Pagination: models.PaginationMetadataAPI{
+			CurrentPageNumber: p.PageNumber,
+			PageCount:         uint64(math.Ceil(float64(total) / float64(p.PageSize))),
+			RecordCount:       total,
+			PageSize:          p.PageSize,
+		},
+	}, nil
 }
 
 // CreateSong создает новую песню.
-func (sl *SongLibrary) CreateSong(ctx context.Context, s models.Song) (uint64, error) {
+func (sl *SongLibrary) CreateSong(ctx context.Context, s models.Song) (models.SongAPI, error) {
 	log := sl.log.With(slog.String("name", s.Name), slog.String("group", s.Group))
 
 	log.Info("attempt to create song")
 
-	id, err := sl.songSaver.SaveSong(ctx, s)
+	s, err := sl.songSaver.SaveSong(ctx, s)
 	if err != nil {
 		log.Error("failed to create song", logger.ErrorString(err))
 
-		return 0, err
+		return models.SongAPI{}, err
 	}
 
-	log.Info("success to create song", slog.Uint64("id", id))
+	log.Info("success to create song", slog.Uint64("id", s.ID))
 
-	return id, nil
+	return s.API(), nil
 }
 
 // ChangeSong обновляет данные определенной песни.
-func (sl *SongLibrary) ChangeSong(ctx context.Context, s models.Song) (models.Song, error) {
+func (sl *SongLibrary) ChangeSong(ctx context.Context, s models.Song) (models.SongAPI, error) {
 	log := sl.log.With(slog.Uint64("id", s.ID))
 
 	log.Info("attempt to change song")
@@ -133,39 +154,39 @@ func (sl *SongLibrary) ChangeSong(ctx context.Context, s models.Song) (models.So
 		if errors.Is(err, repository.ErrSongNotFound) {
 			log.Warn("failed to change song", logger.ErrorString(err))
 
-			return models.Song{}, services.ErrSongNotFound
+			return models.SongAPI{}, services.ErrSongNotFound
 		}
 
 		log.Error("failed to change song", logger.ErrorString(err))
 
-		return models.Song{}, err
+		return models.SongAPI{}, err
 	}
 
 	log.Info("success to change song")
 
-	return s, nil
+	return s.API(), nil
 }
 
 // RemoveSong удаляет определенную песню.
-func (sl *SongLibrary) RemoveSong(ctx context.Context, s models.Song) (uint64, error) {
+func (sl *SongLibrary) RemoveSong(ctx context.Context, s models.Song) (models.SongAPI, error) {
 	log := sl.log.With(slog.Uint64("id", s.ID))
 
 	log.Info("attempt to remove song")
 
-	id, err := sl.songDeleter.DeleteSong(ctx, s)
+	s, err := sl.songDeleter.DeleteSong(ctx, s)
 	if err != nil {
 		if errors.Is(err, repository.ErrSongNotFound) {
 			log.Warn("failed to remove song", logger.ErrorString(err))
 
-			return 0, services.ErrSongNotFound
+			return models.SongAPI{}, services.ErrSongNotFound
 		}
 
 		log.Error("failed to remove song", logger.ErrorString(err))
 
-		return 0, err
+		return models.SongAPI{}, err
 	}
 
 	log.Info("success to remove song")
 
-	return id, nil
+	return s.API(), nil
 }

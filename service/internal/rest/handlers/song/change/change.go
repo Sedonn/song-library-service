@@ -13,12 +13,12 @@ import (
 // SongChanger описывает поведение объекта слоя бизнес-логики, который обновляет данные существующих песен.
 type SongChanger interface {
 	// ChangeSong обновляет данные определенной песни.
-	ChangeSong(ctx context.Context, s models.Song) (models.Song, error)
+	ChangeSong(ctx context.Context, s models.Song) (models.SongAPI, error)
 }
 
 type changeSongRequest struct {
 	models.SongIDAPI
-	Song models.SongOptionalAttributesAPI
+	models.SongOptionalAttributesAPI
 }
 
 // New возвращает новый объект хендлера, который обновляет существующие песни.
@@ -29,18 +29,18 @@ func New(sc SongChanger) gin.HandlerFunc {
 			ctx.AbortWithError(http.StatusBadRequest, err)
 			return
 		}
-		if err := ctx.ShouldBindJSON(&req.Song); err != nil {
+		if err := ctx.ShouldBindJSON(&req); err != nil {
 			ctx.AbortWithError(http.StatusBadRequest, err)
 			return
 		}
 
 		s, err := sc.ChangeSong(ctx, models.Song{
 			ID:          req.ID,
-			Name:        req.Song.Name,
-			Group:       req.Song.Group,
-			ReleaseDate: req.Song.ReleaseDate,
-			Text:        req.Song.Text,
-			Link:        req.Song.Link,
+			Name:        req.Name,
+			Group:       req.Group,
+			ReleaseDate: req.ReleaseDate,
+			Text:        req.Text,
+			Link:        req.Link,
 		})
 		if err != nil {
 			if errors.Is(err, services.ErrSongNotFound) {
