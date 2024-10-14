@@ -3,18 +3,15 @@ package songrest
 import (
 	"github.com/gin-gonic/gin"
 
-	"github.com/sedonn/song-library-service/internal/rest/handlers/song/change"
-	"github.com/sedonn/song-library-service/internal/rest/handlers/song/create"
-	"github.com/sedonn/song-library-service/internal/rest/handlers/song/get"
-	"github.com/sedonn/song-library-service/internal/rest/handlers/song/remove"
+	"github.com/sedonn/song-library-service/internal/rest/handlers/song/internal"
 )
 
 // SongLibraryManager описывает поведение объекта, который обеспечивает бизнес-логику работы с библиотекой песен.
 type SongLibraryManager interface {
-	create.SongCreator
-	get.SongGetter
-	change.SongChanger
-	remove.SongRemover
+	internal.SongCreator
+	internal.SongGetter
+	internal.SongChanger
+	internal.SongRemover
 }
 
 // Handler это корневой хендлер библиотеки песен.
@@ -33,10 +30,10 @@ func New(m SongLibraryManager) *Handler {
 func (h *Handler) BindTo(router *gin.RouterGroup) {
 	songLibrary := router.Group("/songs")
 	{
-		songLibrary.GET("/:id", get.NewGetHandler(h.songLibraryManager))
-		songLibrary.GET("/", get.NewSearchHandler(h.songLibraryManager))
-		songLibrary.POST("/", create.New(h.songLibraryManager))
-		songLibrary.PUT("/:id", change.New(h.songLibraryManager))
-		songLibrary.DELETE("/:id", remove.New(h.songLibraryManager))
+		songLibrary.GET("/:id", internal.NewGetSongHandler(h.songLibraryManager))
+		songLibrary.GET("/", internal.NewSearchSongsHandler(h.songLibraryManager))
+		songLibrary.POST("/", internal.NewCreateSongHandler(h.songLibraryManager))
+		songLibrary.PUT("/:id", internal.NewChangeSongHandler(h.songLibraryManager))
+		songLibrary.DELETE("/:id", internal.NewRemoveSongHandler(h.songLibraryManager))
 	}
 }

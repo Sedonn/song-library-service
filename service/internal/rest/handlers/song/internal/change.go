@@ -1,4 +1,4 @@
-package change
+package internal
 
 import (
 	"context"
@@ -21,7 +21,7 @@ type changeSongRequest struct {
 	models.SongOptionalAttributesAPI
 }
 
-// New возвращает новый объект хендлера, который обновляет существующие песни.
+// NewChangeSongHandler возвращает новый объект хендлера, который обновляет существующие песни.
 //
 //	@Summary		Изменить данные существующей песни.
 //	@Description	Изменить данные существующей песни. Для разделения куплетов необходимо использовать '\n\n'.
@@ -34,15 +34,15 @@ type changeSongRequest struct {
 //	@Failure		400		{object}	mwerror.ErrorResponse
 //	@Failure		500		{object}	mwerror.ErrorResponse
 //	@Router			/songs/{id} [put]
-func New(sc SongChanger) gin.HandlerFunc {
+func NewChangeSongHandler(sc SongChanger) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req changeSongRequest
 		if err := ctx.ShouldBindUri(&req); err != nil {
-			ctx.AbortWithError(http.StatusBadRequest, err)
+			_ = ctx.AbortWithError(http.StatusBadRequest, err)
 			return
 		}
 		if err := ctx.ShouldBindJSON(&req); err != nil {
-			ctx.AbortWithError(http.StatusBadRequest, err)
+			_ = ctx.AbortWithError(http.StatusBadRequest, err)
 			return
 		}
 
@@ -56,11 +56,11 @@ func New(sc SongChanger) gin.HandlerFunc {
 		})
 		if err != nil {
 			if errors.Is(err, services.ErrSongNotFound) {
-				ctx.AbortWithError(http.StatusBadRequest, err)
+				_ = ctx.AbortWithError(http.StatusBadRequest, err)
 				return
 			}
 
-			ctx.AbortWithError(http.StatusInternalServerError, err)
+			_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
 

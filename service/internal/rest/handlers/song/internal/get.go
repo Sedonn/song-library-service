@@ -1,4 +1,4 @@
-package get
+package internal
 
 import (
 	"context"
@@ -25,7 +25,7 @@ type getSongRequest struct {
 	Pagination models.Pagination
 }
 
-// NewGetHandler возвращает новый объект хендлера, который возвращает определенную песню.
+// NewGetSongHandler возвращает новый объект хендлера, который возвращает определенную песню.
 //
 //	@Summary		Получить данные определенной песни.
 //	@Description	Получить данные определенной песни с пагинацией по куплетами.
@@ -38,15 +38,15 @@ type getSongRequest struct {
 //	@Failure		400		{object}	mwerror.ErrorResponse
 //	@Failure		500		{object}	mwerror.ErrorResponse
 //	@Router			/songs/{id} [get]
-func NewGetHandler(sg SongGetter) gin.HandlerFunc {
+func NewGetSongHandler(sg SongGetter) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req getSongRequest
 		if err := ctx.ShouldBindUri(&req.Song); err != nil {
-			ctx.AbortWithError(http.StatusBadRequest, err)
+			_ = ctx.AbortWithError(http.StatusBadRequest, err)
 			return
 		}
 		if err := ctx.ShouldBindQuery(&req.Pagination); err != nil {
-			ctx.AbortWithError(http.StatusBadRequest, err)
+			_ = ctx.AbortWithError(http.StatusBadRequest, err)
 			return
 		}
 
@@ -54,13 +54,13 @@ func NewGetHandler(sg SongGetter) gin.HandlerFunc {
 		if err != nil {
 			switch {
 			case errors.Is(err, services.ErrSongNotFound):
-				ctx.AbortWithError(http.StatusBadRequest, err)
+				_ = ctx.AbortWithError(http.StatusBadRequest, err)
 
 			case errors.Is(err, services.ErrPageNumberOutOfRange):
-				ctx.AbortWithError(http.StatusBadRequest, err)
+				_ = ctx.AbortWithError(http.StatusBadRequest, err)
 
 			default:
-				ctx.AbortWithError(http.StatusInternalServerError, err)
+				_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 			}
 
 			return

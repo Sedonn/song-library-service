@@ -1,4 +1,4 @@
-package get
+package internal
 
 import (
 	"net/http"
@@ -29,11 +29,11 @@ type searchSongRequest struct {
 //	@Failure		400		{object}	mwerror.ErrorResponse
 //	@Failure		500		{object}	mwerror.ErrorResponse
 //	@Router			/songs/ [get]
-func NewSearchHandler(sg SongGetter) gin.HandlerFunc {
+func NewSearchSongsHandler(sg SongGetter) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req searchSongRequest
 		if err := ctx.ShouldBindQuery(&req); err != nil {
-			ctx.AbortWithError(http.StatusBadRequest, err)
+			_ = ctx.AbortWithError(http.StatusBadRequest, err)
 			return
 		}
 
@@ -48,7 +48,7 @@ func NewSearchHandler(sg SongGetter) gin.HandlerFunc {
 			req.Pagination,
 		)
 		if err != nil {
-			ctx.AbortWithError(http.StatusInternalServerError, err)
+			_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
 

@@ -1,4 +1,4 @@
-package create
+package internal
 
 import (
 	"context"
@@ -14,7 +14,7 @@ type SongCreator interface {
 	CreateSong(ctx context.Context, s models.Song) (models.SongAPI, error)
 }
 
-// New возвращает новый объект хендлера, который добавляет новые песни.
+// NewCreateSongHandler возвращает новый объект хендлера, который добавляет новые песни.
 //
 //	@Summary		Добавить новую песню.
 //	@Description	Добавление новой песни. Для разделения куплетов необходимо использовать '\n\n'.
@@ -26,11 +26,11 @@ type SongCreator interface {
 //	@Failure		400		{object}	mwerror.ErrorResponse
 //	@Failure		500		{object}	mwerror.ErrorResponse
 //	@Router			/songs/ [post]
-func New(sc SongCreator) gin.HandlerFunc {
+func NewCreateSongHandler(sc SongCreator) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req models.SongAttributesAPI
 		if err := ctx.ShouldBindJSON(&req); err != nil {
-			ctx.AbortWithError(http.StatusBadRequest, err)
+			_ = ctx.AbortWithError(http.StatusBadRequest, err)
 			return
 		}
 
@@ -42,10 +42,9 @@ func New(sc SongCreator) gin.HandlerFunc {
 			Link:        req.Link,
 		})
 		if err != nil {
-			ctx.AbortWithError(http.StatusInternalServerError, err)
+			_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
-
 		ctx.JSON(http.StatusOK, s)
 	}
 }

@@ -1,4 +1,4 @@
-package remove
+package internal
 
 import (
 	"context"
@@ -16,7 +16,7 @@ type SongRemover interface {
 	RemoveSong(ctx context.Context, s models.Song) (models.SongAPI, error)
 }
 
-// New возвращает новый объект хендлера, который удаляет определенные песни.
+// NewRemoveSongHandler возвращает новый объект хендлера, который удаляет определенные песни.
 //
 //	@Summary		Удалить данные существующей песни.
 //	@Description	Удалить данные существующей песни.
@@ -28,22 +28,22 @@ type SongRemover interface {
 //	@Failure		400		{object}	mwerror.ErrorResponse
 //	@Failure		500		{object}	mwerror.ErrorResponse
 //	@Router			/songs/{id} [delete]
-func New(sr SongRemover) gin.HandlerFunc {
+func NewRemoveSongHandler(sr SongRemover) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req models.SongIDAPI
 		if err := ctx.ShouldBindUri(&req); err != nil {
-			ctx.AbortWithError(http.StatusBadRequest, err)
+			_ = ctx.AbortWithError(http.StatusBadRequest, err)
 			return
 		}
 
 		s, err := sr.RemoveSong(ctx, models.Song{ID: req.ID})
 		if err != nil {
 			if errors.Is(err, services.ErrSongNotFound) {
-				ctx.AbortWithError(http.StatusBadRequest, err)
+				_ = ctx.AbortWithError(http.StatusBadRequest, err)
 				return
 			}
 
-			ctx.AbortWithError(http.StatusInternalServerError, err)
+			_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
 
