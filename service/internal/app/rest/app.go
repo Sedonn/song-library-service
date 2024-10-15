@@ -9,29 +9,24 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gin-gonic/gin/binding"
-	"github.com/go-playground/validator/v10"
 
 	"github.com/sedonn/song-library-service/internal/config"
 	"github.com/sedonn/song-library-service/internal/pkg/logger"
+	artistrest "github.com/sedonn/song-library-service/internal/rest/handlers/artist"
 	songrest "github.com/sedonn/song-library-service/internal/rest/handlers/song"
 	"github.com/sedonn/song-library-service/internal/rest/handlers/swagdocs"
 	mwerror "github.com/sedonn/song-library-service/internal/rest/middleware/error"
-	"github.com/sedonn/song-library-service/internal/rest/validators"
 )
 
 // App это REST-сервер.
 type App struct {
 	log        *slog.Logger
 	httpServer *http.Server
-	cfg        *config.RESTConfig
 }
 
 // New создает новый REST-сервер.
-func New(log *slog.Logger, cfg *config.RESTConfig, s songrest.SongLibraryManager) *App {
+func New(log *slog.Logger, cfg *config.RESTConfig, as artistrest.ArtistService, ss songrest.SongService) *App {
 	router := gin.Default()
-
-	mustRegisterValidators()
 
 	router.Use(mwerror.New())
 
@@ -39,7 +34,8 @@ func New(log *slog.Logger, cfg *config.RESTConfig, s songrest.SongLibraryManager
 	{
 		v1 := api.Group("/v1")
 		{
-			songrest.New(s).BindTo(v1)
+			artistrest.New(as).BindTo(v1)
+			songrest.New(ss).BindTo(v1)
 		}
 	}
 
@@ -53,14 +49,6 @@ func New(log *slog.Logger, cfg *config.RESTConfig, s songrest.SongLibraryManager
 	return &App{
 		log:        log,
 		httpServer: srv,
-		cfg:        cfg,
-	}
-}
-
-// mustRegisterValidators регистрирует кастомные методы валидации.
-func mustRegisterValidators() {
-	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
-		_ = v.RegisterValidation("songreleasedate", validators.SongReleaseDate)
 	}
 }
 

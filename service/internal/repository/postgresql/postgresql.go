@@ -11,6 +11,7 @@ import (
 	"github.com/sedonn/song-library-service/internal/config"
 	"github.com/sedonn/song-library-service/internal/domain/models"
 	"github.com/sedonn/song-library-service/internal/pkg/logger"
+	"github.com/sedonn/song-library-service/internal/services/artist"
 	"github.com/sedonn/song-library-service/internal/services/song"
 )
 
@@ -19,11 +20,17 @@ type Repository struct {
 	db *gorm.DB
 }
 
-var _ song.SongProvider = (*Repository)(nil)
-var _ song.SongSaver = (*Repository)(nil)
+var (
+	_ song.SongProvider = (*Repository)(nil)
+	_ song.SongSaver    = (*Repository)(nil)
+	_ song.SongUpdater  = (*Repository)(nil)
+	_ song.SongDeleter  = (*Repository)(nil)
 
-var _ song.SongUpdater = (*Repository)(nil)
-var _ song.SongDeleter = (*Repository)(nil)
+	_ artist.ArtistProvider = (*Repository)(nil)
+	_ artist.ArtistSaver    = (*Repository)(nil)
+	_ artist.ArtistUpdater  = (*Repository)(nil)
+	_ artist.ArtistDeleter  = (*Repository)(nil)
+)
 
 // New создает новый объект репозитория.
 func New(cfg *config.Config) (*Repository, error) {

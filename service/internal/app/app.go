@@ -6,6 +6,7 @@ import (
 	restapp "github.com/sedonn/song-library-service/internal/app/rest"
 	"github.com/sedonn/song-library-service/internal/config"
 	"github.com/sedonn/song-library-service/internal/repository/postgresql"
+	"github.com/sedonn/song-library-service/internal/services/artist"
 	"github.com/sedonn/song-library-service/internal/services/song"
 )
 
@@ -22,9 +23,10 @@ func New(log *slog.Logger, cfg *config.Config) *App {
 	}
 	log.Info("database connected", slog.String("database", cfg.DB.Database))
 
-	songLibraryService := song.New(log, repository, repository, repository, repository)
+	artistService := artist.New(log, repository, repository, repository, repository)
+	songService := song.New(log, repository, repository, repository, repository)
 
-	restApp := restapp.New(log, &cfg.REST, songLibraryService)
+	restApp := restapp.New(log, &cfg.REST, artistService, songService)
 
 	return &App{
 		RESTApp: restApp,

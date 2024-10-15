@@ -36,7 +36,6 @@ func NewCreateSongHandler(sc SongCreator) gin.HandlerFunc {
 
 		s, err := sc.CreateSong(ctx, models.Song{
 			Name:        req.Name,
-			Group:       req.Group,
 			ReleaseDate: req.ReleaseDate,
 			Text:        req.Text,
 			Link:        req.Link,

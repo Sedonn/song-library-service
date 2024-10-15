@@ -14,7 +14,7 @@ import (
 // Song возвращает данные определенной песни.
 func (r *Repository) Song(ctx context.Context, id uint64) (models.Song, error) {
 	var s models.Song
-	if err := r.db.WithContext(ctx).Take(&s, id).Error; err != nil {
+	if err := r.db.WithContext(ctx).Preload(clause.Associations).Take(&s, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return models.Song{}, repository.ErrSongNotFound
 		}

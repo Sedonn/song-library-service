@@ -125,7 +125,7 @@ func TestSongLibrary_GetSongWithCoupletPagination(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			sl := &SongLibrary{
+			sl := &Service{
 				log:          discardLogger,
 				songProvider: tt.fields.songProvider,
 			}
@@ -196,7 +196,7 @@ func TestSongLibrary_ChangeSong(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			sl := &SongLibrary{
+			sl := &Service{
 				log:         discardLogger,
 				songUpdater: tt.fields.songUpdater,
 			}
@@ -261,7 +261,7 @@ func TestSongLibrary_RemoveSong(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			sl := &SongLibrary{
+			sl := &Service{
 				log:         discardLogger,
 				songDeleter: tt.fields.songDeleter,
 			}

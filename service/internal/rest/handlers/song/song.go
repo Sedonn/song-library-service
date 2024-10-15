@@ -6,8 +6,8 @@ import (
 	"github.com/sedonn/song-library-service/internal/rest/handlers/song/internal"
 )
 
-// SongLibraryManager описывает поведение объекта, который обеспечивает бизнес-логику работы с библиотекой песен.
-type SongLibraryManager interface {
+// SongService описывает поведение объекта, который обеспечивает бизнес-логику работы с библиотекой песен.
+type SongService interface {
 	internal.SongCreator
 	internal.SongGetter
 	internal.SongChanger
@@ -16,24 +16,24 @@ type SongLibraryManager interface {
 
 // Handler это корневой хендлер библиотеки песен.
 type Handler struct {
-	songLibraryManager SongLibraryManager
+	songService SongService
 }
 
 // New создает новый корневой хендлер библиотеки песен.
-func New(m SongLibraryManager) *Handler {
+func New(m SongService) *Handler {
 	return &Handler{
-		songLibraryManager: m,
+		songService: m,
 	}
 }
 
 // BindTo привязывает хендлер к определенной группе маршрутов.
 func (h *Handler) BindTo(router *gin.RouterGroup) {
-	songLibrary := router.Group("/songs")
+	songRouter := router.Group("/songs")
 	{
-		songLibrary.GET("/:id", internal.NewGetSongHandler(h.songLibraryManager))
-		songLibrary.GET("/", internal.NewSearchSongsHandler(h.songLibraryManager))
-		songLibrary.POST("/", internal.NewCreateSongHandler(h.songLibraryManager))
-		songLibrary.PUT("/:id", internal.NewChangeSongHandler(h.songLibraryManager))
-		songLibrary.DELETE("/:id", internal.NewRemoveSongHandler(h.songLibraryManager))
+		songRouter.POST("/", internal.NewCreateSongHandler(h.songService))
+		songRouter.GET("/:id", internal.NewGetSongHandler(h.songService))
+		songRouter.GET("/", internal.NewSearchSongsHandler(h.songService))
+		songRouter.PUT("/:id", internal.NewChangeSongHandler(h.songService))
+		songRouter.DELETE("/:id", internal.NewRemoveSongHandler(h.songService))
 	}
 }

@@ -8,12 +8,11 @@ import (
 )
 
 type searchSongRequest struct {
-	Name        string `form:"name"`
-	Group       string `form:"group"`
-	ReleaseDate string `form:"releaseDate"`
-	Text        string `form:"text"`
-	Link        string `form:"link"`
-	Pagination  models.Pagination
+	Name       string `form:"name"`
+	Group      string `form:"group"`
+	Text       string `form:"text"`
+	Link       string `form:"link"`
+	Pagination models.Pagination
 }
 
 // NewGetHandler возвращает новый объект хендлера, который выполняет поиск песен по определенным параметрам.
@@ -39,11 +38,9 @@ func NewSearchSongsHandler(sg SongGetter) gin.HandlerFunc {
 
 		songs, err := sg.SearchSongs(ctx,
 			models.Song{
-				Name:        req.Name,
-				Group:       req.Group,
-				ReleaseDate: req.ReleaseDate,
-				Text:        req.Text,
-				Link:        req.Link,
+				Name: req.Name,
+				Text: req.Text,
+				Link: req.Link,
 			},
 			req.Pagination,
 		)
