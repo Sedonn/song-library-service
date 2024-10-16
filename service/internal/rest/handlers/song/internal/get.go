@@ -25,7 +25,7 @@ type getSongRequest struct {
 	Pagination models.Pagination
 }
 
-// NewGetSongHandler возвращает новый объект хендлера, который возвращает определенную песню.
+// NewGetSongCoupletsHandler возвращает новый объект хендлера, который возвращает определенную песню.
 //
 //	@Summary		Получить данные определенной песни.
 //	@Description	Получить данные определенной песни с пагинацией по куплетами.
@@ -38,7 +38,7 @@ type getSongRequest struct {
 //	@Failure		400		{object}	mwerror.ErrorResponse
 //	@Failure		500		{object}	mwerror.ErrorResponse
 //	@Router			/songs/{id} [get]
-func NewGetSongHandler(sg SongGetter) gin.HandlerFunc {
+func NewGetSongCoupletsHandler(sg SongGetter) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req getSongRequest
 		if err := ctx.ShouldBindUri(&req.Song); err != nil {

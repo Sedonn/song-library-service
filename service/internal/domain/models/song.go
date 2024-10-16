@@ -22,6 +22,7 @@ func (s Song) API() SongAPI {
 			Text:        s.Text,
 			Link:        s.Link,
 		},
+		Artist: s.Artist.API(),
 	}
 }
 
@@ -40,6 +41,7 @@ func (s Songs) API() []SongAPI {
 type SongAPI struct {
 	SongIDAPI
 	SongAttributesAPI
+	Artist ArtistAPI `json:"artist"`
 }
 
 type SongsAPI struct {

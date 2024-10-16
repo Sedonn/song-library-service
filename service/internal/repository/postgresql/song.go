@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 
+	"github.com/jackc/pgerrcode"
+	"github.com/jackc/pgx/v5/pgconn"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
@@ -36,6 +38,7 @@ func (r *Repository) Songs(ctx context.Context, attrs models.Song, p models.Pagi
 		Scopes(withSearchByStringAttributes(attrs)).
 		Count(&total).
 		Scopes(withPagination(p)).
+		Joins("Artist").
 		Find(&songs).
 		Error
 	if err != nil {
@@ -47,7 +50,17 @@ func (r *Repository) Songs(ctx context.Context, attrs models.Song, p models.Pagi
 
 // SaveSong сохраняет данные новой песни.
 func (r *Repository) SaveSong(ctx context.Context, s models.Song) (models.Song, error) {
-	if err := r.db.WithContext(ctx).Create(&s).Error; err != nil {
+	err := r.db.WithContext(ctx).
+		Clauses(clause.Returning{}).
+		Create(&s).
+		Joins("Artist").
+		Take(&s).
+		Error
+	if err != nil {
+		if isSongArtistNotFoundError(err) {
+			return models.Song{}, repository.ErrArtistNotFound
+		}
+
 		return models.Song{}, err
 	}
 
@@ -56,28 +69,45 @@ func (r *Repository) SaveSong(ctx context.Context, s models.Song) (models.Song, 
 
 // UpdateSong обновляет данные определенной песни.
 func (r *Repository) UpdateSong(ctx context.Context, s models.Song) (models.Song, error) {
-	tx := r.db.WithContext(ctx).Clauses(clause.Returning{}).Updates(&s)
+	tx := r.db.WithContext(ctx).Updates(&s)
 	if tx.Error != nil {
+		if isSongArtistNotFoundError(tx.Error) {
+			return models.Song{}, repository.ErrArtistNotFound
+		}
+
 		return models.Song{}, tx.Error
 	}
 
 	if tx.RowsAffected == 0 {
 		return models.Song{}, repository.ErrSongNotFound
+	}
+
+	if err := r.db.WithContext(ctx).Joins("Artist").Take(&s).Error; err != nil {
+		return models.Song{}, nil
 	}
 
 	return s, nil
 }
 
 // DeleteSong удаляет данные определенной песни.
-func (r *Repository) DeleteSong(ctx context.Context, s models.Song) (models.Song, error) {
-	tx := r.db.WithContext(ctx).Clauses(clause.Returning{}).Delete(&s)
+func (r *Repository) DeleteSong(ctx context.Context, id uint64) (uint64, error) {
+	tx := r.db.WithContext(ctx).Delete(models.Song{ID: id})
 	if tx.Error != nil {
-		return models.Song{}, tx.Error
+		return 0, tx.Error
 	}
 
 	if tx.RowsAffected == 0 {
-		return models.Song{}, repository.ErrSongNotFound
+		return 0, repository.ErrSongNotFound
 	}
 
-	return s, nil
+	return id, nil
+}
+
+func isSongArtistNotFoundError(err error) bool {
+	pgErr, ok := err.(*pgconn.PgError)
+	if !ok {
+		return false
+	}
+
+	return pgerrcode.IsIntegrityConstraintViolation(pgErr.Code) && pgErr.ConstraintName == "fk_songs_artist"
 }

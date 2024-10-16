@@ -6,10 +6,11 @@ import (
 
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5/pgconn"
-	"github.com/sedonn/song-library-service/internal/domain/models"
-	"github.com/sedonn/song-library-service/internal/repository"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
+
+	"github.com/sedonn/song-library-service/internal/domain/models"
+	"github.com/sedonn/song-library-service/internal/repository"
 )
 
 // Artist implements artist.ArtistProvider.
@@ -19,6 +20,8 @@ func (r *Repository) Artist(ctx context.Context, id uint64) (models.Artist, erro
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return models.Artist{}, repository.ErrArtistNotFound
 		}
+
+		return models.Artist{}, err
 	}
 
 	return s, nil

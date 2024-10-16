@@ -44,7 +44,7 @@ type SongUpdater interface {
 //go:generate go run github.com/vektra/mockery/v2@v2.46.1 --name=SongDeleter
 type SongDeleter interface {
 	// DeleteSong удаляет данные определенной песни.
-	DeleteSong(ctx context.Context, s models.Song) (models.Song, error)
+	DeleteSong(ctx context.Context, id uint64) (uint64, error)
 }
 
 // Service предоставляет бизнес-логику работы с библиотекой песен.
@@ -139,6 +139,12 @@ func (s *Service) CreateSong(ctx context.Context, song models.Song) (models.Song
 
 	song, err := s.songSaver.SaveSong(ctx, song)
 	if err != nil {
+		if errors.Is(err, repository.ErrArtistNotFound) {
+			log.Warn("failed to create song", logger.ErrorString(err))
+
+			return models.SongAPI{}, services.ErrArtistNotFound
+		}
+
 		log.Error("failed to create song", logger.ErrorString(err))
 
 		return models.SongAPI{}, err
@@ -157,15 +163,19 @@ func (s *Service) ChangeSong(ctx context.Context, song models.Song) (models.Song
 
 	song, err := s.songUpdater.UpdateSong(ctx, song)
 	if err != nil {
-		if errors.Is(err, repository.ErrSongNotFound) {
+		switch {
+		case errors.Is(err, repository.ErrSongNotFound):
 			log.Warn("failed to change song", logger.ErrorString(err))
-
 			return models.SongAPI{}, services.ErrSongNotFound
+
+		case errors.Is(err, repository.ErrArtistNotFound):
+			log.Warn("failed to change song", logger.ErrorString(err))
+			return models.SongAPI{}, services.ErrArtistNotFound
+
+		default:
+			log.Error("failed to change song", logger.ErrorString(err))
+			return models.SongAPI{}, err
 		}
-
-		log.Error("failed to change song", logger.ErrorString(err))
-
-		return models.SongAPI{}, err
 	}
 
 	log.Info("success to change song")
@@ -174,25 +184,25 @@ func (s *Service) ChangeSong(ctx context.Context, song models.Song) (models.Song
 }
 
 // RemoveSong удаляет определенную песню.
-func (s *Service) RemoveSong(ctx context.Context, song models.Song) (models.SongAPI, error) {
-	log := s.log.With(slog.Uint64("id", song.ID))
+func (s *Service) RemoveSong(ctx context.Context, id uint64) (models.SongIDAPI, error) {
+	log := s.log.With(slog.Uint64("id", id))
 
 	log.Info("attempt to remove song")
 
-	song, err := s.songDeleter.DeleteSong(ctx, song)
+	id, err := s.songDeleter.DeleteSong(ctx, id)
 	if err != nil {
 		if errors.Is(err, repository.ErrSongNotFound) {
 			log.Warn("failed to remove song", logger.ErrorString(err))
 
-			return models.SongAPI{}, services.ErrSongNotFound
+			return models.SongIDAPI{}, services.ErrSongNotFound
 		}
 
 		log.Error("failed to remove song", logger.ErrorString(err))
 
-		return models.SongAPI{}, err
+		return models.SongIDAPI{}, err
 	}
 
 	log.Info("success to remove song")
 
-	return song.API(), nil
+	return models.SongIDAPI{ID: id}, nil
 }

@@ -2,16 +2,23 @@ package internal
 
 import (
 	"context"
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sedonn/song-library-service/internal/domain/models"
+	"github.com/sedonn/song-library-service/internal/services"
 )
 
 // SongCreator описывает поведение объекта слоя бизнес-логики, который добавляет новые песни.
 type SongCreator interface {
 	// CreateSong добавляют новую песню.
 	CreateSong(ctx context.Context, s models.Song) (models.SongAPI, error)
+}
+
+type createSongRequest struct {
+	models.SongAttributesAPI
+	Artist models.ArtistIDAPI `json:"artist"`
 }
 
 // NewCreateSongHandler возвращает новый объект хендлера, который добавляет новые песни.
@@ -28,7 +35,7 @@ type SongCreator interface {
 //	@Router			/songs/ [post]
 func NewCreateSongHandler(sc SongCreator) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var req models.SongAttributesAPI
+		var req createSongRequest
 		if err := ctx.ShouldBindJSON(&req); err != nil {
 			_ = ctx.AbortWithError(http.StatusBadRequest, err)
 			return
@@ -36,11 +43,17 @@ func NewCreateSongHandler(sc SongCreator) gin.HandlerFunc {
 
 		s, err := sc.CreateSong(ctx, models.Song{
 			Name:        req.Name,
+			ArtistID:    req.Artist.ID,
 			ReleaseDate: req.ReleaseDate,
 			Text:        req.Text,
 			Link:        req.Link,
 		})
 		if err != nil {
+			if errors.Is(err, services.ErrArtistNotFound) {
+				_ = ctx.AbortWithError(http.StatusBadRequest, err)
+				return
+			}
+
 			_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}

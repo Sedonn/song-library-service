@@ -31,9 +31,9 @@ func (h *Handler) BindTo(router *gin.RouterGroup) {
 	songRouter := router.Group("/songs")
 	{
 		songRouter.POST("/", internal.NewCreateSongHandler(h.songService))
-		songRouter.GET("/:id", internal.NewGetSongHandler(h.songService))
+		songRouter.GET("/:song-id/couplets", internal.NewGetSongCoupletsHandler(h.songService))
 		songRouter.GET("/", internal.NewSearchSongsHandler(h.songService))
-		songRouter.PUT("/:id", internal.NewChangeSongHandler(h.songService))
-		songRouter.DELETE("/:id", internal.NewRemoveSongHandler(h.songService))
+		songRouter.PUT("/:song-id", internal.NewChangeSongHandler(h.songService))
+		songRouter.DELETE("/:song-id", internal.NewRemoveSongHandler(h.songService))
 	}
 }
