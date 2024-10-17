@@ -4,14 +4,13 @@ import (
 	"context"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-
 	"github.com/sedonn/song-library-service/internal/domain/models"
 	"github.com/sedonn/song-library-service/internal/pkg/logger"
 	"github.com/sedonn/song-library-service/internal/repository"
 	"github.com/sedonn/song-library-service/internal/services"
 	"github.com/sedonn/song-library-service/internal/services/song/mocks"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 var (
@@ -25,9 +24,10 @@ var (
 		ID:   expectedSongID,
 		Text: "one couplet",
 	}
+	expectedSongIDAPI = models.SongIDAPI{ID: expectedSongID}
 )
 
-func TestSongLibrary_GetSongWithCoupletPagination(t *testing.T) {
+func TestService_GetSongWithCoupletPagination(t *testing.T) {
 	t.Parallel()
 
 	type fields struct {
@@ -136,6 +136,77 @@ func TestSongLibrary_GetSongWithCoupletPagination(t *testing.T) {
 	}
 }
 
+func TestSongLibrary_CreateSong(t *testing.T) {
+	t.Parallel()
+
+	type fields struct {
+		songSaver SongSaver
+	}
+	type args struct {
+		ctx context.Context
+		s   models.Song
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    models.SongAPI
+		wantErr error
+	}{
+		{
+			name: "CreateSong happy path",
+			fields: fields{
+				songSaver: func() SongSaver {
+					ss := mocks.NewSongSaver(t)
+					ss.
+						On("SaveSong", mock.Anything, expectedSong).
+						Once().
+						Return(expectedSong, nil)
+
+					return ss
+				}(),
+			},
+			args: args{
+				s: expectedSong,
+			},
+			want: expectedSong.API(),
+		},
+		{
+			name: "CreateSong error artist not found",
+			fields: fields{
+				songSaver: func() SongSaver {
+					ss := mocks.NewSongSaver(t)
+					ss.
+						On("SaveSong", mock.Anything, expectedSong).
+						Once().
+						Return(models.Song{}, repository.ErrArtistNotFound)
+
+					return ss
+				}(),
+			},
+			args: args{
+				s: expectedSong,
+			},
+			wantErr: services.ErrArtistNotFound,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			sl := &Service{
+				log:       discardLogger,
+				songSaver: tt.fields.songSaver,
+			}
+			got, err := sl.CreateSong(tt.args.ctx, tt.args.s)
+			assert.Equal(t, tt.want, got)
+			assert.ErrorIsf(t, err, tt.wantErr, "SongLibrary.CreateSong() error = %v, wantErr %v", err, tt.wantErr)
+		})
+	}
+}
+
 func TestSongLibrary_ChangeSong(t *testing.T) {
 	t.Parallel()
 
@@ -157,13 +228,13 @@ func TestSongLibrary_ChangeSong(t *testing.T) {
 			name: "ChangeSong happy path",
 			fields: fields{
 				songUpdater: func() SongUpdater {
-					sp := mocks.NewSongUpdater(t)
-					sp.
+					su := mocks.NewSongUpdater(t)
+					su.
 						On("UpdateSong", mock.Anything, expectedSong).
 						Once().
 						Return(expectedSong, nil)
 
-					return sp
+					return su
 				}(),
 			},
 			args: args{
@@ -175,19 +246,37 @@ func TestSongLibrary_ChangeSong(t *testing.T) {
 			name: "ChangeSong error song not found",
 			fields: fields{
 				songUpdater: func() SongUpdater {
-					sp := mocks.NewSongUpdater(t)
-					sp.
+					su := mocks.NewSongUpdater(t)
+					su.
 						On("UpdateSong", mock.Anything, expectedSong).
 						Once().
 						Return(models.Song{}, repository.ErrSongNotFound)
 
-					return sp
+					return su
 				}(),
 			},
 			args: args{
 				s: expectedSong,
 			},
 			wantErr: services.ErrSongNotFound,
+		},
+		{
+			name: "ChangeSong error artist not found",
+			fields: fields{
+				songUpdater: func() SongUpdater {
+					su := mocks.NewSongUpdater(t)
+					su.
+						On("UpdateSong", mock.Anything, expectedSong).
+						Once().
+						Return(models.Song{}, repository.ErrArtistNotFound)
+
+					return su
+				}(),
+			},
+			args: args{
+				s: expectedSong,
+			},
+			wantErr: services.ErrArtistNotFound,
 		},
 	}
 
@@ -213,48 +302,48 @@ func TestSongLibrary_RemoveSong(t *testing.T) {
 	}
 	type args struct {
 		ctx context.Context
-		s   models.Song
+		id  uint64
 	}
 	tests := []struct {
 		name    string
 		fields  fields
 		args    args
-		want    models.SongAPI
+		want    models.SongIDAPI
 		wantErr error
 	}{
 		{
 			name: "RemoveSong happy path",
 			fields: fields{
 				songDeleter: func() SongDeleter {
-					sp := mocks.NewSongDeleter(t)
-					sp.
-						On("DeleteSong", mock.Anything, expectedSong).
+					sd := mocks.NewSongDeleter(t)
+					sd.
+						On("DeleteSong", mock.Anything, expectedSongID).
 						Once().
-						Return(expectedSong, nil)
+						Return(expectedSongID, nil)
 
-					return sp
+					return sd
 				}(),
 			},
 			args: args{
-				s: expectedSong,
+				id: expectedSongID,
 			},
-			want: expectedSong.API(),
+			want: expectedSongIDAPI,
 		},
 		{
 			name: "RemoveSong error song not found",
 			fields: fields{
 				songDeleter: func() SongDeleter {
-					sp := mocks.NewSongDeleter(t)
-					sp.
-						On("DeleteSong", mock.Anything, expectedSong).
+					sd := mocks.NewSongDeleter(t)
+					sd.
+						On("DeleteSong", mock.Anything, expectedSongID).
 						Once().
-						Return(models.Song{}, repository.ErrSongNotFound)
+						Return(uint64(0), repository.ErrSongNotFound)
 
-					return sp
+					return sd
 				}(),
 			},
 			args: args{
-				s: expectedSong,
+				id: expectedSongID,
 			},
 			wantErr: services.ErrSongNotFound,
 		},
@@ -265,7 +354,7 @@ func TestSongLibrary_RemoveSong(t *testing.T) {
 				log:         discardLogger,
 				songDeleter: tt.fields.songDeleter,
 			}
-			got, err := sl.RemoveSong(tt.args.ctx, tt.args.s)
+			got, err := sl.RemoveSong(tt.args.ctx, tt.args.id)
 			assert.Equal(t, tt.want, got)
 			assert.ErrorIsf(t, err, tt.wantErr, "SongLibrary.RemoveSong() error = %v, wantErr %v", err, tt.wantErr)
 		})

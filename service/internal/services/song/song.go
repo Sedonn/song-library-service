@@ -26,6 +26,8 @@ type SongProvider interface {
 }
 
 // SongSaver описывает поведение объекта слоя данных, который обеспечивает сохранение данных песен.
+//
+//go:generate go run github.com/vektra/mockery/v2@v2.46.1 --name=SongSaver
 type SongSaver interface {
 	// SaveSong сохраняет данные новой песни.
 	SaveSong(ctx context.Context, s models.Song) (models.Song, error)

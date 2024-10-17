@@ -5,7 +5,6 @@ package mocks
 import (
 	context "context"
 
-	models "github.com/sedonn/song-library-service/internal/domain/models"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -14,27 +13,27 @@ type SongDeleter struct {
 	mock.Mock
 }
 
-// DeleteSong provides a mock function with given fields: ctx, s
-func (_m *SongDeleter) DeleteSong(ctx context.Context, s models.Song) (models.Song, error) {
-	ret := _m.Called(ctx, s)
+// DeleteSong provides a mock function with given fields: ctx, id
+func (_m *SongDeleter) DeleteSong(ctx context.Context, id uint64) (uint64, error) {
+	ret := _m.Called(ctx, id)
 
 	if len(ret) == 0 {
 		panic("no return value specified for DeleteSong")
 	}
 
-	var r0 models.Song
+	var r0 uint64
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, models.Song) (models.Song, error)); ok {
-		return rf(ctx, s)
+	if rf, ok := ret.Get(0).(func(context.Context, uint64) (uint64, error)); ok {
+		return rf(ctx, id)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, models.Song) models.Song); ok {
-		r0 = rf(ctx, s)
+	if rf, ok := ret.Get(0).(func(context.Context, uint64) uint64); ok {
+		r0 = rf(ctx, id)
 	} else {
-		r0 = ret.Get(0).(models.Song)
+		r0 = ret.Get(0).(uint64)
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, models.Song) error); ok {
-		r1 = rf(ctx, s)
+	if rf, ok := ret.Get(1).(func(context.Context, uint64) error); ok {
+		r1 = rf(ctx, id)
 	} else {
 		r1 = ret.Error(1)
 	}

@@ -59,7 +59,7 @@ func (s *Service) CreateArtist(ctx context.Context, a models.Artist) (models.Art
 
 	log.Info("attempt to create artist")
 
-	newArtist, err := s.artistSaver.SaveArtist(ctx, a)
+	a, err := s.artistSaver.SaveArtist(ctx, a)
 	if err != nil {
 		if errors.Is(err, repository.ErrArtistExists) {
 			log.Warn("failed to create artist", logger.ErrorString(err))
@@ -74,7 +74,7 @@ func (s *Service) CreateArtist(ctx context.Context, a models.Artist) (models.Art
 
 	log.Info("success to create artist", slog.Uint64("id", a.ID))
 
-	return newArtist.API(), nil
+	return a.API(), nil
 }
 
 // GetArtist implements artistrest.ArtistService.
@@ -105,22 +105,26 @@ func (s *Service) ChangeArtist(ctx context.Context, a models.Artist) (models.Art
 
 	log.Info("attempt to change artist")
 
-	updatedArtist, err := s.artistUpdater.UpdateArtist(ctx, a)
+	a, err := s.artistUpdater.UpdateArtist(ctx, a)
 	if err != nil {
-		if errors.Is(err, repository.ErrArtistNotFound) {
+		switch {
+		case errors.Is(err, repository.ErrArtistNotFound):
 			log.Warn("failed to change artist", logger.ErrorString(err))
-
 			return models.ArtistAPI{}, services.ErrArtistNotFound
+
+		case errors.Is(err, repository.ErrArtistExists):
+			log.Warn("failed to change artist", logger.ErrorString(err))
+			return models.ArtistAPI{}, services.ErrArtistExists
+
+		default:
+			log.Error("failed to change artist", logger.ErrorString(err))
+			return models.ArtistAPI{}, err
 		}
-
-		log.Error("failed to change artist", logger.ErrorString(err))
-
-		return models.ArtistAPI{}, err
 	}
 
 	log.Info("success to change artist")
 
-	return updatedArtist.API(), nil
+	return a.API(), nil
 }
 
 // RemoveArtist implements artistrest.ArtistService.
@@ -129,7 +133,7 @@ func (s *Service) RemoveArtist(ctx context.Context, a models.Artist) (models.Art
 
 	log.Info("attempt to remove artist")
 
-	deletedArtist, err := s.artistDeleter.DeleteArtist(ctx, a)
+	a, err := s.artistDeleter.DeleteArtist(ctx, a)
 	if err != nil {
 		if errors.Is(err, repository.ErrArtistNotFound) {
 			log.Warn("failed to remove artist", logger.ErrorString(err))
@@ -144,5 +148,5 @@ func (s *Service) RemoveArtist(ctx context.Context, a models.Artist) (models.Art
 
 	log.Info("success to remove artist")
 
-	return deletedArtist.API(), nil
+	return a.API(), nil
 }

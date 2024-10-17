@@ -36,11 +36,16 @@ func NewChangeArtistHandler(ac ArtistChanger) gin.HandlerFunc {
 			Name: req.Name,
 		})
 		if err != nil {
-			if errors.Is(err, services.ErrArtistNotFound) {
+			switch {
+			case errors.Is(err, services.ErrArtistNotFound):
+				fallthrough
+
+			case errors.Is(err, services.ErrArtistExists):
 				_ = ctx.AbortWithError(http.StatusBadRequest, err)
-				return
+
+			default:
+				_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 			}
-			_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
 
