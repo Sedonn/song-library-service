@@ -34,7 +34,7 @@ type changeSongRequest struct {
 //	@Success		200		{object}	models.SongAPI
 //	@Failure		400		{object}	mwerror.ErrorResponse
 //	@Failure		500		{object}	mwerror.ErrorResponse
-//	@Router			/songs/{song-id} [put]
+//	@Router			/songs/{song-id} [patch]
 func NewChangeSongHandler(sc SongChanger) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req changeSongRequest

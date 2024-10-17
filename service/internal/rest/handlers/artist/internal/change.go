@@ -33,7 +33,7 @@ type changeArtistRequest struct {
 //	@Success		200			{object}	models.ArtistAPI
 //	@Failure		400			{object}	mwerror.ErrorResponse
 //	@Failure		500			{object}	mwerror.ErrorResponse
-//	@Router			/artists/{artist-id} [put]
+//	@Router			/artists/{artist-id} [patch]
 func NewChangeArtistHandler(ac ArtistChanger) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req changeArtistRequest

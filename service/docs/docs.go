@@ -103,7 +103,48 @@ const docTemplate = `{
                     }
                 }
             },
-            "put": {
+            "delete": {
+                "description": "Удалить данные исполнителя.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "artist"
+                ],
+                "summary": "Удалить данные исполнителя.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "name": "artist-id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ArtistIDAPI"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/mwerror.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/mwerror.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
                 "description": "Изменить данные исполнителя.",
                 "consumes": [
                     "application/json"
@@ -137,47 +178,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.ArtistAPI"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/mwerror.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/mwerror.ErrorResponse"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "description": "Удалить данные исполнителя.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "artist"
-                ],
-                "summary": "Удалить данные исполнителя.",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "name": "artist-id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.ArtistIDAPI"
                         }
                     },
                     "400": {
@@ -297,7 +297,48 @@ const docTemplate = `{
             }
         },
         "/songs/{song-id}": {
-            "put": {
+            "delete": {
+                "description": "Удалить данные песни.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "song"
+                ],
+                "summary": "Удалить данные песни.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "name": "song-id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.SongIDAPI"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/mwerror.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/mwerror.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
                 "description": "Изменить данные песни. Для разделения куплетов необходимо использовать '\\n\\n'.",
                 "consumes": [
                     "application/json"
@@ -331,47 +372,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.SongAPI"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/mwerror.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/mwerror.ErrorResponse"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "description": "Удалить данные песни.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "song"
-                ],
-                "summary": "Удалить данные песни.",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "name": "song-id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.SongIDAPI"
                         }
                     },
                     "400": {

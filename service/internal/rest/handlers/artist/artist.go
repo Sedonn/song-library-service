@@ -31,7 +31,7 @@ func (h *Handler) BindTo(router *gin.RouterGroup) {
 	{
 		artistRouter.POST("/", internal.NewCreateArtistHandler(h.artistService))
 		artistRouter.GET("/:artist-id", internal.NewGetArtistHandler(h.artistService))
-		artistRouter.PUT("/:artist-id", internal.NewChangeArtistHandler(h.artistService))
+		artistRouter.PATCH("/:artist-id", internal.NewChangeArtistHandler(h.artistService))
 		artistRouter.DELETE("/:artist-id", internal.NewArtistRemoveHandler(h.artistService))
 	}
 }

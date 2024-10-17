@@ -234,7 +234,7 @@ paths:
       summary: Получить данные определенного исполнителя.
       tags:
       - artist
-    put:
+    patch:
       consumes:
       - application/json
       description: Изменить данные исполнителя.
@@ -361,7 +361,7 @@ paths:
       summary: Удалить данные песни.
       tags:
       - song
-    put:
+    patch:
       consumes:
       - application/json
       description: Изменить данные песни. Для разделения куплетов необходимо использовать
