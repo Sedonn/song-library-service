@@ -10,7 +10,7 @@ import (
 	"github.com/sedonn/song-library-service/internal/services"
 )
 
-// SongGetter описывает поведение объекта слоя бизнес-логики, который извлекает данные библиотеки песен.
+// SongGetter описывает поведение объекта слоя бизнес-логики, который извлекает данные песен.
 type SongGetter interface {
 	// GetSongWithCoupletPagination возвращает определенную песню с пагинацией по куплетам.
 	// Текст разбивается на куплеты по \n\n символам.
@@ -29,15 +29,15 @@ type getSongRequest struct {
 //
 //	@Summary		Получить данные определенной песни.
 //	@Description	Получить данные определенной песни с пагинацией по куплетами.
-//	@Tags			song-library
+//	@Tags			song
 //	@Accept			json
 //	@Produce		json
-//	@Param			song	path		models.SongIDAPI	true	"ID песни"
-//	@Param			song	query		models.Pagination	true	"Настройки пагинации. pageNumber игнорируется."
+//	@Param			song-id	path		models.SongIDAPI	true	"ID песни"
+//	@Param			song	query		models.Pagination	true	"Настройки пагинации. pageSize игнорируется."
 //	@Success		200		{object}	models.SongWithCoupletPaginationAPI
 //	@Failure		400		{object}	mwerror.ErrorResponse
 //	@Failure		500		{object}	mwerror.ErrorResponse
-//	@Router			/songs/{id} [get]
+//	@Router			/songs/{song-id}/couplets [get]
 func NewGetSongCoupletsHandler(sg SongGetter) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req getSongRequest

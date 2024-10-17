@@ -10,7 +10,7 @@ import (
 	"github.com/sedonn/song-library-service/internal/services"
 )
 
-// SongChanger описывает поведение объекта слоя бизнес-логики, который обновляет данные существующих песен.
+// SongChanger описывает поведение объекта слоя бизнес-логики, который обновляет данные песен.
 type SongChanger interface {
 	// ChangeSong обновляет данные определенной песни.
 	ChangeSong(ctx context.Context, s models.Song) (models.SongAPI, error)
@@ -22,19 +22,19 @@ type changeSongRequest struct {
 	Artist models.ArtistIDAPI `json:"artist" binding:"omitempty"`
 }
 
-// NewChangeSongHandler возвращает новый объект хендлера, который обновляет существующие песни.
+// NewChangeSongHandler возвращает новый объект хендлера, который обновляет песни.
 //
-//	@Summary		Изменить данные существующей песни.
-//	@Description	Изменить данные существующей песни. Для разделения куплетов необходимо использовать '\n\n'.
-//	@Tags			song-library
+//	@Summary		Изменить данные песни.
+//	@Description	Изменить данные песни. Для разделения куплетов необходимо использовать '\n\n'.
+//	@Tags			song
 //	@Accept			json
 //	@Produce		json
-//	@Param			song	path		models.SongIDAPI					true	"ID песни"
-//	@Param			song	body		models.SongOptionalAttributesAPI	true	"Данные новой песни"
+//	@Param			song-id	path		models.SongIDAPI	true	"ID песни"
+//	@Param			song	body		changeSongRequest	true	"Новые данные песни"
 //	@Success		200		{object}	models.SongAPI
 //	@Failure		400		{object}	mwerror.ErrorResponse
 //	@Failure		500		{object}	mwerror.ErrorResponse
-//	@Router			/songs/{id} [put]
+//	@Router			/songs/{song-id} [put]
 func NewChangeSongHandler(sc SongChanger) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req changeSongRequest

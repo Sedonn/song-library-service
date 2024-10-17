@@ -60,7 +60,7 @@ type Service struct {
 
 var _ songrest.SongService = (*Service)(nil)
 
-// New создает новый объект библиотеки песен.
+// New создает новый объект сервиса песен.
 func New(log *slog.Logger, sp SongProvider, ss SongSaver, su SongUpdater, sd SongDeleter) *Service {
 	return &Service{
 		log:          log,

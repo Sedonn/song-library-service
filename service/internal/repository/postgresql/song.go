@@ -103,6 +103,7 @@ func (r *Repository) DeleteSong(ctx context.Context, id uint64) (uint64, error) 
 	return id, nil
 }
 
+// isSongArtistNotFoundError проверяет, является ли ошибка ошибкой ErrArtistNotFound.
 func isSongArtistNotFoundError(err error) bool {
 	pgErr, ok := err.(*pgconn.PgError)
 	if !ok {

@@ -6,7 +6,7 @@ import (
 	"github.com/sedonn/song-library-service/internal/rest/handlers/song/internal"
 )
 
-// SongService описывает поведение объекта, который обеспечивает бизнес-логику работы с библиотекой песен.
+// SongService описывает поведение объекта, который обеспечивает бизнес-логику работы с песнями.
 type SongService interface {
 	internal.SongCreator
 	internal.SongGetter
@@ -14,12 +14,12 @@ type SongService interface {
 	internal.SongRemover
 }
 
-// Handler это корневой хендлер библиотеки песен.
+// Handler это корневой хендлер сервиса песен.
 type Handler struct {
 	songService SongService
 }
 
-// New создает новый корневой хендлер библиотеки песен.
+// New создает новый корневой хендлер сервиса песен.
 func New(m SongService) *Handler {
 	return &Handler{
 		songService: m,

@@ -10,10 +10,24 @@ import (
 	"golang.org/x/net/context"
 )
 
+// ArtistCreator описывает поведение объекта слоя бизнес-логики, который добавляет новых исполнителей.
 type ArtistCreator interface {
+	// CreateArtist добавляет нового исполнителя.
 	CreateArtist(ctx context.Context, a models.Artist) (models.ArtistAPI, error)
 }
 
+// NewCreateArtistHandler возвращает новый объект хендлера, который добавляет новых исполнителей.
+//
+//	@Summary		Добавить нового исполнителя.
+//	@Description	Добавить нового исполнителя. Название исполнителя должно быть уникальным.
+//	@Tags			artist
+//	@Accept			json
+//	@Produce		json
+//	@Param			artist	body		models.ArtistAttributesAPI	true	"Данные нового исполнителя"
+//	@Success		200		{object}	models.ArtistAPI
+//	@Failure		400		{object}	mwerror.ErrorResponse
+//	@Failure		500		{object}	mwerror.ErrorResponse
+//	@Router			/artists/ [post]
 func NewCreateArtistHandler(ac ArtistCreator) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req models.ArtistAttributesAPI

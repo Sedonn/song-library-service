@@ -25,10 +25,10 @@ type createSongRequest struct {
 //
 //	@Summary		Добавить новую песню.
 //	@Description	Добавление новой песни. Для разделения куплетов необходимо использовать '\n\n'.
-//	@Tags			song-library
+//	@Tags			song
 //	@Accept			json
 //	@Produce		json
-//	@Param			song	body		models.SongAttributesAPI	true	"Данные новой песни"
+//	@Param			song	body		createSongRequest	true	"Данные новой песни"
 //	@Success		200		{object}	models.SongAPI
 //	@Failure		400		{object}	mwerror.ErrorResponse
 //	@Failure		500		{object}	mwerror.ErrorResponse

@@ -12,23 +12,35 @@ import (
 	"github.com/sedonn/song-library-service/internal/services"
 )
 
+// ArtistSaver описывает поведение объекта слоя данных, который обеспечивает сохранение данных исполнителей.
+//
 //go:generate go run github.com/vektra/mockery/v2@v2.46.1 --name=ArtistSaver
 type ArtistSaver interface {
+	// SaveArtist сохраняет данные нового исполнителя.
 	SaveArtist(ctx context.Context, a models.Artist) (models.Artist, error)
 }
 
+// ArtistProvider описывает поведение объекта слоя данных, который обеспечивает предоставление данных о исполнителях.
+//
 //go:generate go run github.com/vektra/mockery/v2@v2.46.1 --name=ArtistProvider
 type ArtistProvider interface {
+	// Artist возвращает данные определенного исполнителя.
 	Artist(ctx context.Context, id uint64) (models.Artist, error)
 }
 
+// ArtistUpdater описывает поведение объекта слоя данных, который обеспечивает обновление данных о исполнителях.
+//
 //go:generate go run github.com/vektra/mockery/v2@v2.46.1 --name=ArtistUpdater
 type ArtistUpdater interface {
+	// UpdateArtist обновляет данные определенного исполнителя.
 	UpdateArtist(ctx context.Context, a models.Artist) (models.Artist, error)
 }
 
+// ArtistDeleter описывает поведение объекта слоя данных, который обеспечивает удаление данных о исполнителях.
+//
 //go:generate go run github.com/vektra/mockery/v2@v2.46.1 --name=ArtistDeleter
 type ArtistDeleter interface {
+	// DeleteArtist удаляет данные определенного исполнителя.
 	DeleteArtist(ctx context.Context, id uint64) (uint64, error)
 }
 
@@ -42,7 +54,7 @@ type Service struct {
 
 var _ artistrest.ArtistService = (*Service)(nil)
 
-// New создает новый объект библиотеки песен.
+// New создает новый объект сервиса исполнителей.
 func New(log *slog.Logger, as ArtistSaver, ap ArtistProvider, au ArtistUpdater, ad ArtistDeleter) *Service {
 	return &Service{
 		log:            log,
@@ -53,7 +65,7 @@ func New(log *slog.Logger, as ArtistSaver, ap ArtistProvider, au ArtistUpdater, 
 	}
 }
 
-// CreateArtist implements artistrest.ArtistService.
+// CreateArtist создает нового исполнителя.
 func (s *Service) CreateArtist(ctx context.Context, a models.Artist) (models.ArtistAPI, error) {
 	log := s.log.With(slog.String("name", a.Name))
 
@@ -77,7 +89,7 @@ func (s *Service) CreateArtist(ctx context.Context, a models.Artist) (models.Art
 	return a.API(), nil
 }
 
-// GetArtist implements artistrest.ArtistService.
+// GetArtist возвращает нового исполнителя.
 func (s *Service) GetArtist(ctx context.Context, id uint64) (models.ArtistAPI, error) {
 	log := s.log.With(slog.Uint64("id", id))
 
@@ -99,7 +111,7 @@ func (s *Service) GetArtist(ctx context.Context, id uint64) (models.ArtistAPI, e
 	return a.API(), nil
 }
 
-// ChangeArtist implements artistrest.ArtistService.
+// ChangeArtist изменяет данные определенного исполнителя.
 func (s *Service) ChangeArtist(ctx context.Context, a models.Artist) (models.ArtistAPI, error) {
 	log := s.log.With(slog.Uint64("id", a.ID))
 
@@ -127,7 +139,7 @@ func (s *Service) ChangeArtist(ctx context.Context, a models.Artist) (models.Art
 	return a.API(), nil
 }
 
-// RemoveArtist implements artistrest.ArtistService.
+// RemoveArtist удаляет данные определенного исполнителя.
 func (s *Service) RemoveArtist(ctx context.Context, id uint64) (models.ArtistIDAPI, error) {
 	log := s.log.With(slog.Uint64("id", id))
 

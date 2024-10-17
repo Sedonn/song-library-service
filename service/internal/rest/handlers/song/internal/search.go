@@ -19,12 +19,11 @@ type searchSongRequest struct {
 //
 //	@Summary		Поиск определенной песни.
 //	@Description	Поиск определенной песни по всем атрибутам.
-//	@Tags			song-library
+//	@Tags			song
 //	@Accept			json
 //	@Produce		json
 //	@Param			song	query		searchSongRequest	true	"Настройки поиска."
-//	@Param			song	query		models.Pagination	true	"Настройки пагинации поиска."
-//	@Success		200		{object}	models.SongWithCoupletPaginationAPI
+//	@Success		200		{object}	models.SongsAPI
 //	@Failure		400		{object}	mwerror.ErrorResponse
 //	@Failure		500		{object}	mwerror.ErrorResponse
 //	@Router			/songs/ [get]

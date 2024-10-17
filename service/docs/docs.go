@@ -15,6 +15,186 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/artists/": {
+            "post": {
+                "description": "Добавить нового исполнителя. Название исполнителя должно быть уникальным.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "artist"
+                ],
+                "summary": "Добавить нового исполнителя.",
+                "parameters": [
+                    {
+                        "description": "Данные нового исполнителя",
+                        "name": "artist",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ArtistAttributesAPI"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ArtistAPI"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/mwerror.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/mwerror.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/artists/{artist-id}": {
+            "get": {
+                "description": "Получить данные определенного исполнителя.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "artist"
+                ],
+                "summary": "Получить данные определенного исполнителя.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "name": "artist-id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ArtistAPI"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/mwerror.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/mwerror.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Изменить данные исполнителя.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "artist"
+                ],
+                "summary": "Изменить данные исполнителя.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "name": "artist-id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Новые данные исполнителя",
+                        "name": "artist",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/internal.changeArtistRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ArtistAPI"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/mwerror.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/mwerror.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Удалить данные исполнителя.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "artist"
+                ],
+                "summary": "Удалить данные исполнителя.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "name": "artist-id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ArtistIDAPI"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/mwerror.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/mwerror.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/songs/": {
             "get": {
                 "description": "Поиск определенной песни по всем атрибутам.",
@@ -25,7 +205,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "song-library"
+                    "song"
                 ],
                 "summary": "Поиск определенной песни.",
                 "parameters": [
@@ -46,25 +226,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "name": "releaseDate",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
                         "name": "text",
-                        "in": "query"
-                    },
-                    {
-                        "minimum": 1,
-                        "type": "integer",
-                        "name": "pageNumber",
-                        "in": "query"
-                    },
-                    {
-                        "maximum": 100,
-                        "minimum": 10,
-                        "type": "integer",
-                        "name": "pageSize",
                         "in": "query"
                     }
                 ],
@@ -72,7 +234,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.SongWithCoupletPaginationAPI"
+                            "$ref": "#/definitions/models.SongsAPI"
                         }
                     },
                     "400": {
@@ -98,7 +260,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "song-library"
+                    "song"
                 ],
                 "summary": "Добавить новую песню.",
                 "parameters": [
@@ -108,7 +270,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.SongAttributesAPI"
+                            "$ref": "#/definitions/internal.createSongRequest"
                         }
                     }
                 ],
@@ -134,7 +296,100 @@ const docTemplate = `{
                 }
             }
         },
-        "/songs/{id}": {
+        "/songs/{song-id}": {
+            "put": {
+                "description": "Изменить данные песни. Для разделения куплетов необходимо использовать '\\n\\n'.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "song"
+                ],
+                "summary": "Изменить данные песни.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "name": "song-id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Новые данные песни",
+                        "name": "song",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/internal.changeSongRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.SongAPI"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/mwerror.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/mwerror.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Удалить данные песни.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "song"
+                ],
+                "summary": "Удалить данные песни.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "name": "song-id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.SongIDAPI"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/mwerror.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/mwerror.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/songs/{song-id}/couplets": {
             "get": {
                 "description": "Получить данные определенной песни с пагинацией по куплетами.",
                 "consumes": [
@@ -144,13 +399,13 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "song-library"
+                    "song"
                 ],
                 "summary": "Получить данные определенной песни.",
                 "parameters": [
                     {
                         "type": "integer",
-                        "name": "id",
+                        "name": "song-id",
                         "in": "path",
                         "required": true
                     },
@@ -188,101 +443,118 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
-            "put": {
-                "description": "Изменить данные существующей песни. Для разделения куплетов необходимо использовать '\\n\\n'.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "song-library"
-                ],
-                "summary": "Изменить данные существующей песни.",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Данные новой песни",
-                        "name": "song",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.SongOptionalAttributesAPI"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.SongAPI"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/mwerror.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/mwerror.ErrorResponse"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "description": "Удалить данные существующей песни.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "song-library"
-                ],
-                "summary": "Удалить данные существующей песни.",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.SongAPI"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/mwerror.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/mwerror.ErrorResponse"
-                        }
-                    }
-                }
             }
         }
     },
     "definitions": {
+        "internal.changeArtistRequest": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 130
+                }
+            }
+        },
+        "internal.changeSongRequest": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "artist": {
+                    "$ref": "#/definitions/models.ArtistIDAPI"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "link": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 130
+                },
+                "releaseDate": {
+                    "type": "string"
+                },
+                "text": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal.createSongRequest": {
+            "type": "object",
+            "required": [
+                "link",
+                "name",
+                "releaseDate",
+                "text"
+            ],
+            "properties": {
+                "artist": {
+                    "$ref": "#/definitions/models.ArtistIDAPI"
+                },
+                "link": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 130
+                },
+                "releaseDate": {
+                    "type": "string"
+                },
+                "text": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ArtistAPI": {
+            "type": "object",
+            "required": [
+                "id",
+                "name"
+            ],
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 130
+                }
+            }
+        },
+        "models.ArtistAttributesAPI": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "maxLength": 130
+                }
+            }
+        },
+        "models.ArtistIDAPI": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
         "models.Pagination": {
             "type": "object",
             "properties": {
@@ -317,7 +589,6 @@ const docTemplate = `{
         "models.SongAPI": {
             "type": "object",
             "required": [
-                "group",
                 "id",
                 "link",
                 "name",
@@ -325,9 +596,8 @@ const docTemplate = `{
                 "text"
             ],
             "properties": {
-                "group": {
-                    "type": "string",
-                    "maxLength": 130
+                "artist": {
+                    "$ref": "#/definitions/models.ArtistAPI"
                 },
                 "id": {
                     "type": "integer"
@@ -347,54 +617,14 @@ const docTemplate = `{
                 }
             }
         },
-        "models.SongAttributesAPI": {
+        "models.SongIDAPI": {
             "type": "object",
             "required": [
-                "group",
-                "link",
-                "name",
-                "releaseDate",
-                "text"
+                "id"
             ],
             "properties": {
-                "group": {
-                    "type": "string",
-                    "maxLength": 130
-                },
-                "link": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string",
-                    "maxLength": 130
-                },
-                "releaseDate": {
-                    "type": "string"
-                },
-                "text": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.SongOptionalAttributesAPI": {
-            "type": "object",
-            "properties": {
-                "group": {
-                    "type": "string",
-                    "maxLength": 130
-                },
-                "link": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string",
-                    "maxLength": 130
-                },
-                "releaseDate": {
-                    "type": "string"
-                },
-                "text": {
-                    "type": "string"
+                "id": {
+                    "type": "integer"
                 }
             }
         },
@@ -406,6 +636,20 @@ const docTemplate = `{
                 },
                 "song": {
                     "$ref": "#/definitions/models.SongAPI"
+                }
+            }
+        },
+        "models.SongsAPI": {
+            "type": "object",
+            "properties": {
+                "pagination": {
+                    "$ref": "#/definitions/models.PaginationMetadataAPI"
+                },
+                "songs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.SongAPI"
+                    }
                 }
             }
         },
@@ -422,7 +666,7 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "1.0.0",
+	Version:          "",
 	Host:             "",
 	BasePath:         "/api/v1",
 	Schemes:          []string{},

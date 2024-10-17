@@ -5,6 +5,7 @@ import (
 	"github.com/sedonn/song-library-service/internal/rest/handlers/artist/internal"
 )
 
+// ArtistService описывает поведение объекта, который обеспечивает бизнес-логику работы с исполнителями.
 type ArtistService interface {
 	internal.ArtistCreator
 	internal.ArtistGetter
@@ -12,16 +13,19 @@ type ArtistService interface {
 	internal.ArtistRemover
 }
 
+// Handler это корневой хендлер сервиса исполнителей.
 type Handler struct {
 	artistService ArtistService
 }
 
+// New создает новый корневой хендлер сервиса исполнителей.
 func New(s ArtistService) *Handler {
 	return &Handler{
 		artistService: s,
 	}
 }
 
+// BindTo привязывает хендлер к определенной группе маршрутов.
 func (h *Handler) BindTo(router *gin.RouterGroup) {
 	artistRouter := router.Group("/artists")
 	{
