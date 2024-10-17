@@ -211,7 +211,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "name": "group",
+                        "name": "artistName",
                         "in": "query"
                     },
                     {
@@ -222,11 +222,6 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "name": "name",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "name": "text",
                         "in": "query"
                     }
                 ],

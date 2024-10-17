@@ -16,7 +16,7 @@ import (
 // Song возвращает данные определенной песни.
 func (r *Repository) Song(ctx context.Context, id uint64) (models.Song, error) {
 	var s models.Song
-	if err := r.db.WithContext(ctx).Preload(clause.Associations).Take(&s, id).Error; err != nil {
+	if err := r.db.WithContext(ctx).InnerJoins("Artist").Take(&s, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return models.Song{}, repository.ErrSongNotFound
 		}
@@ -35,10 +35,13 @@ func (r *Repository) Songs(ctx context.Context, attrs models.Song, p models.Pagi
 	err := r.db.
 		WithContext(ctx).
 		Model(models.Song{}).
-		Scopes(withSearchByStringAttributes(attrs)).
+		InnerJoins("Artist").
+		Scopes(
+			withSearchByStringColumn("songs", "name", attrs.Name),
+			withSearchByStringColumn("songs", "link", attrs.Link),
+			withSearchByStringColumn("Artist", "name", attrs.Artist.Name)).
 		Count(&total).
 		Scopes(withPagination(p)).
-		Joins("Artist").
 		Find(&songs).
 		Error
 	if err != nil {
@@ -53,7 +56,7 @@ func (r *Repository) SaveSong(ctx context.Context, s models.Song) (models.Song, 
 	err := r.db.WithContext(ctx).
 		Clauses(clause.Returning{}).
 		Create(&s).
-		Joins("Artist").
+		InnerJoins("Artist").
 		Take(&s).
 		Error
 	if err != nil {
@@ -82,7 +85,7 @@ func (r *Repository) UpdateSong(ctx context.Context, s models.Song) (models.Song
 		return models.Song{}, repository.ErrSongNotFound
 	}
 
-	if err := r.db.WithContext(ctx).Joins("Artist").Take(&s).Error; err != nil {
+	if err := r.db.WithContext(ctx).InnerJoins("Artist").Take(&s).Error; err != nil {
 		return models.Song{}, nil
 	}
 

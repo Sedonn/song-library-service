@@ -9,8 +9,7 @@ import (
 
 type searchSongRequest struct {
 	Name       string `form:"name"`
-	Group      string `form:"group"`
-	Text       string `form:"text"`
+	ArtistName string `form:"artistName"`
 	Link       string `form:"link"`
 	Pagination models.Pagination
 }
@@ -38,7 +37,9 @@ func NewSearchSongsHandler(sg SongGetter) gin.HandlerFunc {
 		songs, err := sg.SearchSongs(ctx,
 			models.Song{
 				Name: req.Name,
-				Text: req.Text,
+				Artist: models.Artist{
+					Name: req.ArtistName,
+				},
 				Link: req.Link,
 			},
 			req.Pagination,

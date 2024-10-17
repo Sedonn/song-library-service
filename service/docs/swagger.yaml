@@ -274,16 +274,13 @@ paths:
       description: Поиск определенной песни по всем атрибутам.
       parameters:
       - in: query
-        name: group
+        name: artistName
         type: string
       - in: query
         name: link
         type: string
       - in: query
         name: name
-        type: string
-      - in: query
-        name: text
         type: string
       produces:
       - application/json
