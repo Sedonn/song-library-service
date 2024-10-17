@@ -61,15 +61,15 @@ func (r *Repository) UpdateArtist(ctx context.Context, a models.Artist) (models.
 }
 
 // DeleteArtist implements artist.ArtistDeleter.
-func (r *Repository) DeleteArtist(ctx context.Context, a models.Artist) (models.Artist, error) {
-	tx := r.db.WithContext(ctx).Clauses(clause.Returning{}).Delete(&a)
+func (r *Repository) DeleteArtist(ctx context.Context, id uint64) (uint64, error) {
+	tx := r.db.WithContext(ctx).Delete(models.Artist{ID: id})
 	if tx.Error != nil {
-		return models.Artist{}, tx.Error
+		return 0, tx.Error
 	}
 
 	if tx.RowsAffected == 0 {
-		return models.Artist{}, repository.ErrArtistNotFound
+		return 0, repository.ErrArtistNotFound
 	}
 
-	return a, nil
+	return id, nil
 }

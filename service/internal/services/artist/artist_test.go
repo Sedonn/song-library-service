@@ -261,13 +261,13 @@ func TestService_RemoveArtist(t *testing.T) {
 	}
 	type args struct {
 		ctx context.Context
-		a   models.Artist
+		id  uint64
 	}
 	tests := []struct {
 		name    string
 		fields  fields
 		args    args
-		want    models.ArtistAPI
+		want    models.ArtistIDAPI
 		wantErr error
 	}{
 		{
@@ -276,17 +276,17 @@ func TestService_RemoveArtist(t *testing.T) {
 				artistDeleter: func() ArtistDeleter {
 					ad := mocks.NewArtistDeleter(t)
 					ad.
-						On("DeleteArtist", mock.Anything, expectedArtist).
+						On("DeleteArtist", mock.Anything, expectedArtistID).
 						Once().
-						Return(expectedArtist, nil)
+						Return(expectedArtistID, nil)
 
 					return ad
 				}(),
 			},
 			args: args{
-				a: expectedArtist,
+				id: expectedArtistID,
 			},
-			want:    expectedArtist.API(),
+			want:    models.ArtistIDAPI{ID: expectedArtistID},
 			wantErr: nil,
 		},
 		{
@@ -295,16 +295,17 @@ func TestService_RemoveArtist(t *testing.T) {
 				artistDeleter: func() ArtistDeleter {
 					ad := mocks.NewArtistDeleter(t)
 					ad.
-						On("DeleteArtist", mock.Anything, expectedArtist).
+						On("DeleteArtist", mock.Anything, expectedArtistID).
 						Once().
-						Return(models.Artist{}, repository.ErrArtistNotFound)
+						Return(uint64(0), repository.ErrArtistNotFound)
 
 					return ad
 				}(),
 			},
 			args: args{
-				a: expectedArtist,
+				id: expectedArtistID,
 			},
+			want:    models.ArtistIDAPI{},
 			wantErr: services.ErrArtistNotFound,
 		},
 	}
@@ -318,7 +319,7 @@ func TestService_RemoveArtist(t *testing.T) {
 				log:           discardLogger,
 				artistDeleter: tt.fields.artistDeleter,
 			}
-			got, err := s.RemoveArtist(tt.args.ctx, tt.args.a)
+			got, err := s.RemoveArtist(tt.args.ctx, tt.args.id)
 			assert.Equal(t, tt.want, got)
 			assert.ErrorIsf(t, err, tt.wantErr, "Service.RemoveArtist() error = %v, wantErr %v", err, tt.wantErr)
 		})

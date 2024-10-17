@@ -11,7 +11,7 @@ import (
 )
 
 type ArtistRemover interface {
-	RemoveArtist(ctx context.Context, a models.Artist) (models.ArtistAPI, error)
+	RemoveArtist(ctx context.Context, id uint64) (models.ArtistIDAPI, error)
 }
 
 func NewArtistRemoveHandler(ar ArtistRemover) gin.HandlerFunc {
@@ -22,9 +22,7 @@ func NewArtistRemoveHandler(ar ArtistRemover) gin.HandlerFunc {
 			return
 		}
 
-		a, err := ar.RemoveArtist(ctx, models.Artist{
-			ID: req.ID,
-		})
+		id, err := ar.RemoveArtist(ctx, req.ID)
 		if err != nil {
 			if errors.Is(err, services.ErrArtistNotFound) {
 				_ = ctx.AbortWithError(http.StatusBadRequest, err)
@@ -35,6 +33,6 @@ func NewArtistRemoveHandler(ar ArtistRemover) gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(http.StatusOK, a)
+		ctx.JSON(http.StatusOK, id)
 	}
 }

@@ -29,7 +29,7 @@ type ArtistUpdater interface {
 
 //go:generate go run github.com/vektra/mockery/v2@v2.46.1 --name=ArtistDeleter
 type ArtistDeleter interface {
-	DeleteArtist(ctx context.Context, a models.Artist) (models.Artist, error)
+	DeleteArtist(ctx context.Context, id uint64) (uint64, error)
 }
 
 type Service struct {
@@ -128,25 +128,25 @@ func (s *Service) ChangeArtist(ctx context.Context, a models.Artist) (models.Art
 }
 
 // RemoveArtist implements artistrest.ArtistService.
-func (s *Service) RemoveArtist(ctx context.Context, a models.Artist) (models.ArtistAPI, error) {
-	log := s.log.With(slog.Uint64("id", a.ID))
+func (s *Service) RemoveArtist(ctx context.Context, id uint64) (models.ArtistIDAPI, error) {
+	log := s.log.With(slog.Uint64("id", id))
 
 	log.Info("attempt to remove artist")
 
-	a, err := s.artistDeleter.DeleteArtist(ctx, a)
+	id, err := s.artistDeleter.DeleteArtist(ctx, id)
 	if err != nil {
 		if errors.Is(err, repository.ErrArtistNotFound) {
 			log.Warn("failed to remove artist", logger.ErrorString(err))
 
-			return models.ArtistAPI{}, services.ErrArtistNotFound
+			return models.ArtistIDAPI{}, services.ErrArtistNotFound
 		}
 
 		log.Error("failed to remove artist", logger.ErrorString(err))
 
-		return models.ArtistAPI{}, err
+		return models.ArtistIDAPI{}, err
 	}
 
 	log.Info("success to remove artist")
 
-	return a.API(), nil
+	return models.ArtistIDAPI{ID: id}, nil
 }
