@@ -27,7 +27,7 @@ func (r *Repository) Artist(ctx context.Context, id uint64) (models.Artist, erro
 	return s, nil
 }
 
-// Artist сохраняет данные определенного исполнителя.
+// SaveArtist сохраняет данные определенного исполнителя.
 func (r *Repository) SaveArtist(ctx context.Context, a models.Artist) (models.Artist, error) {
 	if tx := r.db.WithContext(ctx).Clauses(clause.Returning{}).Create(&a); tx.Error != nil {
 		pgErr, ok := tx.Error.(*pgconn.PgError)
@@ -41,7 +41,7 @@ func (r *Repository) SaveArtist(ctx context.Context, a models.Artist) (models.Ar
 	return a, nil
 }
 
-// Artist обновляет данные определенного исполнителя.
+// UpdateArtist обновляет данные определенного исполнителя.
 func (r *Repository) UpdateArtist(ctx context.Context, a models.Artist) (models.Artist, error) {
 	tx := r.db.WithContext(ctx).Clauses(clause.Returning{}).Updates(&a)
 	if tx.Error != nil {
@@ -60,7 +60,7 @@ func (r *Repository) UpdateArtist(ctx context.Context, a models.Artist) (models.
 	return a, nil
 }
 
-// Artist удаляет данные определенного исполнителя.
+// DeleteArtist удаляет данные определенного исполнителя.
 func (r *Repository) DeleteArtist(ctx context.Context, id uint64) (uint64, error) {
 	tx := r.db.WithContext(ctx).Delete(models.Artist{ID: id})
 	if tx.Error != nil {

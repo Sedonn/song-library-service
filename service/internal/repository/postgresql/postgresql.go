@@ -59,7 +59,6 @@ func withSearchByStringColumn(table, column, value string) func(db *gorm.DB) *go
 			return db
 		}
 
-		// return db.Where("? ILIKE %?%", column, value)
 		return db.Where(fmt.Sprintf("%q.%q ILIKE '%%%s%%'", table, column, value))
 	}
 }
