@@ -4,13 +4,14 @@ import (
 	"context"
 	"testing"
 
-	"github.com/sedonn/song-library-service/internal/domain/models"
-	"github.com/sedonn/song-library-service/internal/pkg/logger"
-	"github.com/sedonn/song-library-service/internal/repository"
-	"github.com/sedonn/song-library-service/internal/services"
-	"github.com/sedonn/song-library-service/internal/services/artist/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+
+	"github.com/sedonn/song-library-service/internal/domain/models"
+	"github.com/sedonn/song-library-service/internal/pkg/logger"
+	"github.com/sedonn/song-library-service/internal/repositories"
+	"github.com/sedonn/song-library-service/internal/services"
+	"github.com/sedonn/song-library-service/internal/services/artist/mocks"
 )
 
 var (
@@ -62,7 +63,7 @@ func TestService_CreateArtist(t *testing.T) {
 					as.
 						On("SaveArtist", mock.Anything, expectedArtist).
 						Once().
-						Return(models.Artist{}, repository.ErrArtistExists)
+						Return(models.Artist{}, repositories.ErrArtistExists)
 					return as
 				}(),
 			},
@@ -134,7 +135,7 @@ func TestService_GetArtist(t *testing.T) {
 					ap.
 						On("Artist", mock.Anything, expectedArtistID).
 						Once().
-						Return(models.Artist{}, repository.ErrArtistNotFound)
+						Return(models.Artist{}, repositories.ErrArtistNotFound)
 
 					return ap
 				}(),
@@ -206,7 +207,7 @@ func TestService_ChangeArtist(t *testing.T) {
 					au.
 						On("UpdateArtist", mock.Anything, expectedArtist).
 						Once().
-						Return(models.Artist{}, repository.ErrArtistNotFound)
+						Return(models.Artist{}, repositories.ErrArtistNotFound)
 
 					return au
 				}(),
@@ -225,7 +226,7 @@ func TestService_ChangeArtist(t *testing.T) {
 					au.
 						On("UpdateArtist", mock.Anything, expectedArtist).
 						Once().
-						Return(models.Artist{}, repository.ErrArtistExists)
+						Return(models.Artist{}, repositories.ErrArtistExists)
 
 					return au
 				}(),
@@ -297,7 +298,7 @@ func TestService_RemoveArtist(t *testing.T) {
 					ad.
 						On("DeleteArtist", mock.Anything, expectedArtistID).
 						Once().
-						Return(uint64(0), repository.ErrArtistNotFound)
+						Return(uint64(0), repositories.ErrArtistNotFound)
 
 					return ad
 				}(),

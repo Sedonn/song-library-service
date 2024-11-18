@@ -7,10 +7,10 @@ import (
 	"math"
 	"strings"
 
+	songrest "github.com/sedonn/song-library-service/internal/controllers/rest/song"
 	"github.com/sedonn/song-library-service/internal/domain/models"
 	"github.com/sedonn/song-library-service/internal/pkg/logger"
-	"github.com/sedonn/song-library-service/internal/repository"
-	songrest "github.com/sedonn/song-library-service/internal/rest/handlers/song"
+	"github.com/sedonn/song-library-service/internal/repositories"
 	"github.com/sedonn/song-library-service/internal/services"
 )
 
@@ -80,7 +80,7 @@ func (s *Service) GetSongWithCoupletPagination(ctx context.Context, id uint64, p
 
 	song, err := s.songProvider.Song(ctx, id)
 	if err != nil {
-		if errors.Is(err, repository.ErrSongNotFound) {
+		if errors.Is(err, repositories.ErrSongNotFound) {
 			log.Warn("failed to provide song", logger.ErrorString(err))
 
 			return models.SongWithCoupletPaginationAPI{}, services.ErrSongNotFound
@@ -141,7 +141,7 @@ func (s *Service) CreateSong(ctx context.Context, song models.Song) (models.Song
 
 	song, err := s.songSaver.SaveSong(ctx, song)
 	if err != nil {
-		if errors.Is(err, repository.ErrArtistNotFound) {
+		if errors.Is(err, repositories.ErrArtistNotFound) {
 			log.Warn("failed to create song", logger.ErrorString(err))
 
 			return models.SongAPI{}, services.ErrArtistNotFound
@@ -166,11 +166,11 @@ func (s *Service) ChangeSong(ctx context.Context, song models.Song) (models.Song
 	song, err := s.songUpdater.UpdateSong(ctx, song)
 	if err != nil {
 		switch {
-		case errors.Is(err, repository.ErrSongNotFound):
+		case errors.Is(err, repositories.ErrSongNotFound):
 			log.Warn("failed to change song", logger.ErrorString(err))
 			return models.SongAPI{}, services.ErrSongNotFound
 
-		case errors.Is(err, repository.ErrArtistNotFound):
+		case errors.Is(err, repositories.ErrArtistNotFound):
 			log.Warn("failed to change song", logger.ErrorString(err))
 			return models.SongAPI{}, services.ErrArtistNotFound
 
@@ -193,7 +193,7 @@ func (s *Service) RemoveSong(ctx context.Context, id uint64) (models.SongIDAPI, 
 
 	id, err := s.songDeleter.DeleteSong(ctx, id)
 	if err != nil {
-		if errors.Is(err, repository.ErrSongNotFound) {
+		if errors.Is(err, repositories.ErrSongNotFound) {
 			log.Warn("failed to remove song", logger.ErrorString(err))
 
 			return models.SongIDAPI{}, services.ErrSongNotFound

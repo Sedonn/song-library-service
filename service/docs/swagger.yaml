@@ -1,6 +1,12 @@
 basePath: /api/v1
 definitions:
-  internal.changeArtistRequest:
+  artistrest.ChangeArtistRequestBody:
+    properties:
+      name:
+        maxLength: 130
+        type: string
+    type: object
+  artistrest.ChangeArtistResponse:
     properties:
       id:
         type: integer
@@ -9,43 +15,44 @@ definitions:
         type: string
     required:
     - id
-    type: object
-  internal.changeSongRequest:
-    properties:
-      artist:
-        $ref: '#/definitions/models.ArtistIDAPI'
-      id:
-        type: integer
-      link:
-        type: string
-      name:
-        maxLength: 130
-        type: string
-      releaseDate:
-        type: string
-      text:
-        type: string
-    required:
-    - id
-    type: object
-  internal.createSongRequest:
-    properties:
-      artist:
-        $ref: '#/definitions/models.ArtistIDAPI'
-      link:
-        type: string
-      name:
-        maxLength: 130
-        type: string
-      releaseDate:
-        type: string
-      text:
-        type: string
-    required:
-    - link
     - name
-    - releaseDate
-    - text
+    type: object
+  artistrest.CreateArtistRequest:
+    properties:
+      name:
+        maxLength: 130
+        type: string
+    required:
+    - name
+    type: object
+  artistrest.CreateArtistResponse:
+    properties:
+      id:
+        type: integer
+      name:
+        maxLength: 130
+        type: string
+    required:
+    - id
+    - name
+    type: object
+  artistrest.GetArtistResponse:
+    properties:
+      id:
+        type: integer
+      name:
+        maxLength: 130
+        type: string
+    required:
+    - id
+    - name
+    type: object
+  artistrest.RemoveArtistResponse:
+    properties:
+      id:
+        type: integer
+    required:
+    - id
     type: object
   models.ArtistAPI:
     properties:
@@ -56,14 +63,6 @@ definitions:
         type: string
     required:
     - id
-    - name
-    type: object
-  models.ArtistAttributesAPI:
-    properties:
-      name:
-        maxLength: 130
-        type: string
-    required:
     - name
     type: object
   models.ArtistIDAPI:
@@ -116,21 +115,103 @@ definitions:
     - releaseDate
     - text
     type: object
-  models.SongIDAPI:
+  mwerror.ErrorResponse:
     properties:
+      error:
+        type: string
+    type: object
+  songrest.ChangeSongRequestBody:
+    properties:
+      artist:
+        $ref: '#/definitions/models.ArtistIDAPI'
+      link:
+        type: string
+      name:
+        maxLength: 130
+        type: string
+      releaseDate:
+        type: string
+      text:
+        type: string
+    type: object
+  songrest.ChangeSongResponse:
+    properties:
+      artist:
+        $ref: '#/definitions/models.ArtistAPI'
       id:
         type: integer
+      link:
+        type: string
+      name:
+        maxLength: 130
+        type: string
+      releaseDate:
+        type: string
+      text:
+        type: string
     required:
     - id
+    - link
+    - name
+    - releaseDate
+    - text
     type: object
-  models.SongWithCoupletPaginationAPI:
+  songrest.CreateSongRequest:
+    properties:
+      artist:
+        $ref: '#/definitions/models.ArtistIDAPI'
+      link:
+        type: string
+      name:
+        maxLength: 130
+        type: string
+      releaseDate:
+        type: string
+      text:
+        type: string
+    required:
+    - link
+    - name
+    - releaseDate
+    - text
+    type: object
+  songrest.CreateSongResponse:
+    properties:
+      artist:
+        $ref: '#/definitions/models.ArtistAPI'
+      id:
+        type: integer
+      link:
+        type: string
+      name:
+        maxLength: 130
+        type: string
+      releaseDate:
+        type: string
+      text:
+        type: string
+    required:
+    - id
+    - link
+    - name
+    - releaseDate
+    - text
+    type: object
+  songrest.GetSongResponse:
     properties:
       pagination:
         $ref: '#/definitions/models.PaginationMetadataAPI'
       song:
         $ref: '#/definitions/models.SongAPI'
     type: object
-  models.SongsAPI:
+  songrest.RemoveSongResponse:
+    properties:
+      id:
+        type: integer
+    required:
+    - id
+    type: object
+  songrest.SearchSongsResponse:
     properties:
       pagination:
         $ref: '#/definitions/models.PaginationMetadataAPI'
@@ -138,11 +219,6 @@ definitions:
         items:
           $ref: '#/definitions/models.SongAPI'
         type: array
-    type: object
-  mwerror.ErrorResponse:
-    properties:
-      error:
-        type: string
     type: object
 info:
   contact: {}
@@ -160,14 +236,14 @@ paths:
         name: artist
         required: true
         schema:
-          $ref: '#/definitions/models.ArtistAttributesAPI'
+          $ref: '#/definitions/artistrest.CreateArtistRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.ArtistAPI'
+            $ref: '#/definitions/artistrest.CreateArtistResponse'
         "400":
           description: Bad Request
           schema:
@@ -195,7 +271,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.ArtistIDAPI'
+            $ref: '#/definitions/artistrest.RemoveArtistResponse'
         "400":
           description: Bad Request
           schema:
@@ -222,7 +298,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.ArtistAPI'
+            $ref: '#/definitions/artistrest.GetArtistResponse'
         "400":
           description: Bad Request
           schema:
@@ -231,7 +307,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/mwerror.ErrorResponse'
-      summary: Получить данные определенного исполнителя.
+      summary: Получить данные определенного исполнителяяяя.
       tags:
       - artist
     patch:
@@ -248,14 +324,14 @@ paths:
         name: artist
         required: true
         schema:
-          $ref: '#/definitions/internal.changeArtistRequest'
+          $ref: '#/definitions/artistrest.ChangeArtistRequestBody'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.ArtistAPI'
+            $ref: '#/definitions/artistrest.ChangeArtistResponse'
         "400":
           description: Bad Request
           schema:
@@ -288,7 +364,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.SongsAPI'
+            $ref: '#/definitions/songrest.SearchSongsResponse'
         "400":
           description: Bad Request
           schema:
@@ -311,14 +387,14 @@ paths:
         name: song
         required: true
         schema:
-          $ref: '#/definitions/internal.createSongRequest'
+          $ref: '#/definitions/songrest.CreateSongRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.SongAPI'
+            $ref: '#/definitions/songrest.CreateSongResponse'
         "400":
           description: Bad Request
           schema:
@@ -346,7 +422,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.SongIDAPI'
+            $ref: '#/definitions/songrest.RemoveSongResponse'
         "400":
           description: Bad Request
           schema:
@@ -373,14 +449,14 @@ paths:
         name: song
         required: true
         schema:
-          $ref: '#/definitions/internal.changeSongRequest'
+          $ref: '#/definitions/songrest.ChangeSongRequestBody'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.SongAPI'
+            $ref: '#/definitions/songrest.ChangeSongResponse'
         "400":
           description: Bad Request
           schema:
@@ -417,7 +493,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.SongWithCoupletPaginationAPI'
+            $ref: '#/definitions/songrest.GetSongResponse'
         "400":
           description: Bad Request
           schema:

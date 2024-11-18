@@ -35,7 +35,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.ArtistAttributesAPI"
+                            "$ref": "#/definitions/artistrest.CreateArtistRequest"
                         }
                     }
                 ],
@@ -43,7 +43,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.ArtistAPI"
+                            "$ref": "#/definitions/artistrest.CreateArtistResponse"
                         }
                     },
                     "400": {
@@ -73,7 +73,7 @@ const docTemplate = `{
                 "tags": [
                     "artist"
                 ],
-                "summary": "Получить данные определенного исполнителя.",
+                "summary": "Получить данные определенного исполнителяяяя.",
                 "parameters": [
                     {
                         "type": "integer",
@@ -86,7 +86,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.ArtistAPI"
+                            "$ref": "#/definitions/artistrest.GetArtistResponse"
                         }
                     },
                     "400": {
@@ -127,7 +127,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.ArtistIDAPI"
+                            "$ref": "#/definitions/artistrest.RemoveArtistResponse"
                         }
                     },
                     "400": {
@@ -169,7 +169,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal.changeArtistRequest"
+                            "$ref": "#/definitions/artistrest.ChangeArtistRequestBody"
                         }
                     }
                 ],
@@ -177,7 +177,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.ArtistAPI"
+                            "$ref": "#/definitions/artistrest.ChangeArtistResponse"
                         }
                     },
                     "400": {
@@ -229,7 +229,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.SongsAPI"
+                            "$ref": "#/definitions/songrest.SearchSongsResponse"
                         }
                     },
                     "400": {
@@ -265,7 +265,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal.createSongRequest"
+                            "$ref": "#/definitions/songrest.CreateSongRequest"
                         }
                     }
                 ],
@@ -273,7 +273,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.SongAPI"
+                            "$ref": "#/definitions/songrest.CreateSongResponse"
                         }
                     },
                     "400": {
@@ -316,7 +316,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.SongIDAPI"
+                            "$ref": "#/definitions/songrest.RemoveSongResponse"
                         }
                     },
                     "400": {
@@ -358,7 +358,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal.changeSongRequest"
+                            "$ref": "#/definitions/songrest.ChangeSongRequestBody"
                         }
                     }
                 ],
@@ -366,7 +366,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.SongAPI"
+                            "$ref": "#/definitions/songrest.ChangeSongResponse"
                         }
                     },
                     "400": {
@@ -422,7 +422,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.SongWithCoupletPaginationAPI"
+                            "$ref": "#/definitions/songrest.GetSongResponse"
                         }
                     },
                     "400": {
@@ -442,76 +442,16 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "internal.changeArtistRequest": {
+        "artistrest.ChangeArtistRequestBody": {
             "type": "object",
-            "required": [
-                "id"
-            ],
             "properties": {
-                "id": {
-                    "type": "integer"
-                },
                 "name": {
                     "type": "string",
                     "maxLength": 130
                 }
             }
         },
-        "internal.changeSongRequest": {
-            "type": "object",
-            "required": [
-                "id"
-            ],
-            "properties": {
-                "artist": {
-                    "$ref": "#/definitions/models.ArtistIDAPI"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "link": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string",
-                    "maxLength": 130
-                },
-                "releaseDate": {
-                    "type": "string"
-                },
-                "text": {
-                    "type": "string"
-                }
-            }
-        },
-        "internal.createSongRequest": {
-            "type": "object",
-            "required": [
-                "link",
-                "name",
-                "releaseDate",
-                "text"
-            ],
-            "properties": {
-                "artist": {
-                    "$ref": "#/definitions/models.ArtistIDAPI"
-                },
-                "link": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string",
-                    "maxLength": 130
-                },
-                "releaseDate": {
-                    "type": "string"
-                },
-                "text": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.ArtistAPI": {
+        "artistrest.ChangeArtistResponse": {
             "type": "object",
             "required": [
                 "id",
@@ -527,12 +467,71 @@ const docTemplate = `{
                 }
             }
         },
-        "models.ArtistAttributesAPI": {
+        "artistrest.CreateArtistRequest": {
             "type": "object",
             "required": [
                 "name"
             ],
             "properties": {
+                "name": {
+                    "type": "string",
+                    "maxLength": 130
+                }
+            }
+        },
+        "artistrest.CreateArtistResponse": {
+            "type": "object",
+            "required": [
+                "id",
+                "name"
+            ],
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 130
+                }
+            }
+        },
+        "artistrest.GetArtistResponse": {
+            "type": "object",
+            "required": [
+                "id",
+                "name"
+            ],
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 130
+                }
+            }
+        },
+        "artistrest.RemoveArtistResponse": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.ArtistAPI": {
+            "type": "object",
+            "required": [
+                "id",
+                "name"
+            ],
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
                 "name": {
                     "type": "string",
                     "maxLength": 130
@@ -612,18 +611,125 @@ const docTemplate = `{
                 }
             }
         },
-        "models.SongIDAPI": {
+        "mwerror.ErrorResponse": {
             "type": "object",
-            "required": [
-                "id"
-            ],
             "properties": {
-                "id": {
-                    "type": "integer"
+                "error": {
+                    "type": "string"
                 }
             }
         },
-        "models.SongWithCoupletPaginationAPI": {
+        "songrest.ChangeSongRequestBody": {
+            "type": "object",
+            "properties": {
+                "artist": {
+                    "$ref": "#/definitions/models.ArtistIDAPI"
+                },
+                "link": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 130
+                },
+                "releaseDate": {
+                    "type": "string"
+                },
+                "text": {
+                    "type": "string"
+                }
+            }
+        },
+        "songrest.ChangeSongResponse": {
+            "type": "object",
+            "required": [
+                "id",
+                "link",
+                "name",
+                "releaseDate",
+                "text"
+            ],
+            "properties": {
+                "artist": {
+                    "$ref": "#/definitions/models.ArtistAPI"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "link": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 130
+                },
+                "releaseDate": {
+                    "type": "string"
+                },
+                "text": {
+                    "type": "string"
+                }
+            }
+        },
+        "songrest.CreateSongRequest": {
+            "type": "object",
+            "required": [
+                "link",
+                "name",
+                "releaseDate",
+                "text"
+            ],
+            "properties": {
+                "artist": {
+                    "$ref": "#/definitions/models.ArtistIDAPI"
+                },
+                "link": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 130
+                },
+                "releaseDate": {
+                    "type": "string"
+                },
+                "text": {
+                    "type": "string"
+                }
+            }
+        },
+        "songrest.CreateSongResponse": {
+            "type": "object",
+            "required": [
+                "id",
+                "link",
+                "name",
+                "releaseDate",
+                "text"
+            ],
+            "properties": {
+                "artist": {
+                    "$ref": "#/definitions/models.ArtistAPI"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "link": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 130
+                },
+                "releaseDate": {
+                    "type": "string"
+                },
+                "text": {
+                    "type": "string"
+                }
+            }
+        },
+        "songrest.GetSongResponse": {
             "type": "object",
             "properties": {
                 "pagination": {
@@ -634,7 +740,18 @@ const docTemplate = `{
                 }
             }
         },
-        "models.SongsAPI": {
+        "songrest.RemoveSongResponse": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "songrest.SearchSongsResponse": {
             "type": "object",
             "properties": {
                 "pagination": {
@@ -645,14 +762,6 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/models.SongAPI"
                     }
-                }
-            }
-        },
-        "mwerror.ErrorResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string"
                 }
             }
         }

@@ -10,7 +10,7 @@ import (
 	"gorm.io/gorm/clause"
 
 	"github.com/sedonn/song-library-service/internal/domain/models"
-	"github.com/sedonn/song-library-service/internal/repository"
+	"github.com/sedonn/song-library-service/internal/repositories"
 )
 
 // Song возвращает данные определенной песни.
@@ -18,7 +18,7 @@ func (r *Repository) Song(ctx context.Context, id uint64) (models.Song, error) {
 	var s models.Song
 	if err := r.db.WithContext(ctx).InnerJoins("Artist").Take(&s, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return models.Song{}, repository.ErrSongNotFound
+			return models.Song{}, repositories.ErrSongNotFound
 		}
 	}
 
@@ -61,7 +61,7 @@ func (r *Repository) SaveSong(ctx context.Context, s models.Song) (models.Song, 
 		Error
 	if err != nil {
 		if isSongArtistNotFoundError(err) {
-			return models.Song{}, repository.ErrArtistNotFound
+			return models.Song{}, repositories.ErrArtistNotFound
 		}
 
 		return models.Song{}, err
@@ -75,14 +75,14 @@ func (r *Repository) UpdateSong(ctx context.Context, s models.Song) (models.Song
 	tx := r.db.WithContext(ctx).Updates(&s)
 	if tx.Error != nil {
 		if isSongArtistNotFoundError(tx.Error) {
-			return models.Song{}, repository.ErrArtistNotFound
+			return models.Song{}, repositories.ErrArtistNotFound
 		}
 
 		return models.Song{}, tx.Error
 	}
 
 	if tx.RowsAffected == 0 {
-		return models.Song{}, repository.ErrSongNotFound
+		return models.Song{}, repositories.ErrSongNotFound
 	}
 
 	if err := r.db.WithContext(ctx).InnerJoins("Artist").Take(&s).Error; err != nil {
@@ -100,7 +100,7 @@ func (r *Repository) DeleteSong(ctx context.Context, id uint64) (uint64, error) 
 	}
 
 	if tx.RowsAffected == 0 {
-		return 0, repository.ErrSongNotFound
+		return 0, repositories.ErrSongNotFound
 	}
 
 	return id, nil

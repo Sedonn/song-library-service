@@ -5,10 +5,10 @@ import (
 	"errors"
 	"log/slog"
 
+	artistrest "github.com/sedonn/song-library-service/internal/controllers/rest/artist"
 	"github.com/sedonn/song-library-service/internal/domain/models"
 	"github.com/sedonn/song-library-service/internal/pkg/logger"
-	"github.com/sedonn/song-library-service/internal/repository"
-	artistrest "github.com/sedonn/song-library-service/internal/rest/handlers/artist"
+	"github.com/sedonn/song-library-service/internal/repositories"
 	"github.com/sedonn/song-library-service/internal/services"
 )
 
@@ -73,7 +73,7 @@ func (s *Service) CreateArtist(ctx context.Context, a models.Artist) (models.Art
 
 	a, err := s.artistSaver.SaveArtist(ctx, a)
 	if err != nil {
-		if errors.Is(err, repository.ErrArtistExists) {
+		if errors.Is(err, repositories.ErrArtistExists) {
 			log.Warn("failed to create artist", logger.ErrorString(err))
 
 			return models.ArtistAPI{}, services.ErrArtistExists
@@ -97,7 +97,7 @@ func (s *Service) GetArtist(ctx context.Context, id uint64) (models.ArtistAPI, e
 
 	a, err := s.artistProvider.Artist(ctx, id)
 	if err != nil {
-		if errors.Is(err, repository.ErrArtistNotFound) {
+		if errors.Is(err, repositories.ErrArtistNotFound) {
 			log.Warn("failed to provide artist", logger.ErrorString(err))
 
 			return models.ArtistAPI{}, services.ErrArtistNotFound
@@ -120,11 +120,11 @@ func (s *Service) ChangeArtist(ctx context.Context, a models.Artist) (models.Art
 	a, err := s.artistUpdater.UpdateArtist(ctx, a)
 	if err != nil {
 		switch {
-		case errors.Is(err, repository.ErrArtistNotFound):
+		case errors.Is(err, repositories.ErrArtistNotFound):
 			log.Warn("failed to change artist", logger.ErrorString(err))
 			return models.ArtistAPI{}, services.ErrArtistNotFound
 
-		case errors.Is(err, repository.ErrArtistExists):
+		case errors.Is(err, repositories.ErrArtistExists):
 			log.Warn("failed to change artist", logger.ErrorString(err))
 			return models.ArtistAPI{}, services.ErrArtistExists
 
@@ -147,7 +147,7 @@ func (s *Service) RemoveArtist(ctx context.Context, id uint64) (models.ArtistIDA
 
 	id, err := s.artistDeleter.DeleteArtist(ctx, id)
 	if err != nil {
-		if errors.Is(err, repository.ErrArtistNotFound) {
+		if errors.Is(err, repositories.ErrArtistNotFound) {
 			log.Warn("failed to remove artist", logger.ErrorString(err))
 
 			return models.ArtistIDAPI{}, services.ErrArtistNotFound

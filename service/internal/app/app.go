@@ -5,7 +5,7 @@ import (
 
 	restapp "github.com/sedonn/song-library-service/internal/app/rest"
 	"github.com/sedonn/song-library-service/internal/config"
-	"github.com/sedonn/song-library-service/internal/repository/postgresql"
+	"github.com/sedonn/song-library-service/internal/repositories/postgresql"
 	"github.com/sedonn/song-library-service/internal/services/artist"
 	"github.com/sedonn/song-library-service/internal/services/song"
 )

@@ -11,11 +11,11 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/sedonn/song-library-service/internal/config"
+	artistrest "github.com/sedonn/song-library-service/internal/controllers/rest/artist"
+	mwerror "github.com/sedonn/song-library-service/internal/controllers/rest/middleware/error"
+	songrest "github.com/sedonn/song-library-service/internal/controllers/rest/song"
+	"github.com/sedonn/song-library-service/internal/controllers/rest/swagdocs"
 	"github.com/sedonn/song-library-service/internal/pkg/logger"
-	artistrest "github.com/sedonn/song-library-service/internal/rest/handlers/artist"
-	songrest "github.com/sedonn/song-library-service/internal/rest/handlers/song"
-	"github.com/sedonn/song-library-service/internal/rest/handlers/swagdocs"
-	mwerror "github.com/sedonn/song-library-service/internal/rest/middleware/error"
 )
 
 // App это REST-сервер.

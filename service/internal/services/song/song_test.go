@@ -4,13 +4,14 @@ import (
 	"context"
 	"testing"
 
-	"github.com/sedonn/song-library-service/internal/domain/models"
-	"github.com/sedonn/song-library-service/internal/pkg/logger"
-	"github.com/sedonn/song-library-service/internal/repository"
-	"github.com/sedonn/song-library-service/internal/services"
-	"github.com/sedonn/song-library-service/internal/services/song/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+
+	"github.com/sedonn/song-library-service/internal/domain/models"
+	"github.com/sedonn/song-library-service/internal/pkg/logger"
+	"github.com/sedonn/song-library-service/internal/repositories"
+	"github.com/sedonn/song-library-service/internal/services"
+	"github.com/sedonn/song-library-service/internal/services/song/mocks"
 )
 
 var (
@@ -82,7 +83,7 @@ func TestService_GetSongWithCoupletPagination(t *testing.T) {
 					sp.
 						On("Song", mock.Anything, expectedSongID).
 						Once().
-						Return(models.Song{}, repository.ErrSongNotFound)
+						Return(models.Song{}, repositories.ErrSongNotFound)
 
 					return sp
 				}(),
@@ -179,7 +180,7 @@ func TestSongLibrary_CreateSong(t *testing.T) {
 					ss.
 						On("SaveSong", mock.Anything, expectedSong).
 						Once().
-						Return(models.Song{}, repository.ErrArtistNotFound)
+						Return(models.Song{}, repositories.ErrArtistNotFound)
 
 					return ss
 				}(),
@@ -250,7 +251,7 @@ func TestSongLibrary_ChangeSong(t *testing.T) {
 					su.
 						On("UpdateSong", mock.Anything, expectedSong).
 						Once().
-						Return(models.Song{}, repository.ErrSongNotFound)
+						Return(models.Song{}, repositories.ErrSongNotFound)
 
 					return su
 				}(),
@@ -268,7 +269,7 @@ func TestSongLibrary_ChangeSong(t *testing.T) {
 					su.
 						On("UpdateSong", mock.Anything, expectedSong).
 						Once().
-						Return(models.Song{}, repository.ErrArtistNotFound)
+						Return(models.Song{}, repositories.ErrArtistNotFound)
 
 					return su
 				}(),
@@ -337,7 +338,7 @@ func TestSongLibrary_RemoveSong(t *testing.T) {
 					sd.
 						On("DeleteSong", mock.Anything, expectedSongID).
 						Once().
-						Return(uint64(0), repository.ErrSongNotFound)
+						Return(uint64(0), repositories.ErrSongNotFound)
 
 					return sd
 				}(),

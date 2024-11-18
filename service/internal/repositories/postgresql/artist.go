@@ -10,7 +10,7 @@ import (
 	"gorm.io/gorm/clause"
 
 	"github.com/sedonn/song-library-service/internal/domain/models"
-	"github.com/sedonn/song-library-service/internal/repository"
+	"github.com/sedonn/song-library-service/internal/repositories"
 )
 
 // Artist возвращает данные определенного исполнителя.
@@ -18,7 +18,7 @@ func (r *Repository) Artist(ctx context.Context, id uint64) (models.Artist, erro
 	var s models.Artist
 	if err := r.db.WithContext(ctx).Take(&s, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return models.Artist{}, repository.ErrArtistNotFound
+			return models.Artist{}, repositories.ErrArtistNotFound
 		}
 
 		return models.Artist{}, err
@@ -32,7 +32,7 @@ func (r *Repository) SaveArtist(ctx context.Context, a models.Artist) (models.Ar
 	if tx := r.db.WithContext(ctx).Clauses(clause.Returning{}).Create(&a); tx.Error != nil {
 		pgErr, ok := tx.Error.(*pgconn.PgError)
 		if ok && pgerrcode.IsIntegrityConstraintViolation(pgErr.Code) {
-			return models.Artist{}, repository.ErrArtistExists
+			return models.Artist{}, repositories.ErrArtistExists
 		}
 
 		return models.Artist{}, tx.Error
@@ -47,14 +47,14 @@ func (r *Repository) UpdateArtist(ctx context.Context, a models.Artist) (models.
 	if tx.Error != nil {
 		pgErr, ok := tx.Error.(*pgconn.PgError)
 		if ok && pgerrcode.IsIntegrityConstraintViolation(pgErr.Code) {
-			return models.Artist{}, repository.ErrArtistExists
+			return models.Artist{}, repositories.ErrArtistExists
 		}
 
 		return models.Artist{}, tx.Error
 	}
 
 	if tx.RowsAffected == 0 {
-		return models.Artist{}, repository.ErrArtistNotFound
+		return models.Artist{}, repositories.ErrArtistNotFound
 	}
 
 	return a, nil
@@ -68,7 +68,7 @@ func (r *Repository) DeleteArtist(ctx context.Context, id uint64) (uint64, error
 	}
 
 	if tx.RowsAffected == 0 {
-		return 0, repository.ErrArtistNotFound
+		return 0, repositories.ErrArtistNotFound
 	}
 
 	return id, nil
