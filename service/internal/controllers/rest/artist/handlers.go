@@ -19,6 +19,7 @@ import (
 //	@Param			artist-id	path		GetArtistRequest	true	"ID исполнителя"
 //	@Success		200			{object}	GetArtistResponse
 //	@Failure		400			{object}	mwerror.ErrorResponse
+//	@Failure		404			{object}	mwerror.ErrorResponse
 //	@Failure		500			{object}	mwerror.ErrorResponse
 //	@Router			/artists/{artist-id} [get]
 func (e *Endpoints) getArtistHandler(ctx *gin.Context) {
@@ -31,7 +32,7 @@ func (e *Endpoints) getArtistHandler(ctx *gin.Context) {
 	a, err := e.artistService.GetArtist(ctx, req.ID)
 	if err != nil {
 		if errors.Is(err, services.ErrArtistNotFound) {
-			_ = ctx.AbortWithError(http.StatusBadRequest, err)
+			_ = ctx.AbortWithError(http.StatusNotFound, err)
 			return
 		}
 		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
@@ -85,6 +86,7 @@ func (e *Endpoints) createArtistHandler(ctx *gin.Context) {
 //	@Param			artist		body		ChangeArtistRequestBody	true	"Новые данные исполнителя"
 //	@Success		200			{object}	ChangeArtistResponse
 //	@Failure		400			{object}	mwerror.ErrorResponse
+//	@Failure		404			{object}	mwerror.ErrorResponse
 //	@Failure		500			{object}	mwerror.ErrorResponse
 //	@Router			/artists/{artist-id} [patch]
 func (e *Endpoints) changeArtistHandler(ctx *gin.Context) {
@@ -105,7 +107,7 @@ func (e *Endpoints) changeArtistHandler(ctx *gin.Context) {
 	if err != nil {
 		switch {
 		case errors.Is(err, services.ErrArtistNotFound):
-			fallthrough
+			_ = ctx.AbortWithError(http.StatusNotFound, err)
 
 		case errors.Is(err, services.ErrArtistExists):
 			_ = ctx.AbortWithError(http.StatusBadRequest, err)
@@ -129,6 +131,7 @@ func (e *Endpoints) changeArtistHandler(ctx *gin.Context) {
 //	@Param			artist-id	path		RemoveArtistRequest	true	"ID исполнителя"
 //	@Success		200			{object}	RemoveArtistResponse
 //	@Failure		400			{object}	mwerror.ErrorResponse
+//	@Failure		404			{object}	mwerror.ErrorResponse
 //	@Failure		500			{object}	mwerror.ErrorResponse
 //	@Router			/artists/{artist-id} [delete]
 func (e *Endpoints) removeArtistHandler(ctx *gin.Context) {
@@ -141,7 +144,7 @@ func (e *Endpoints) removeArtistHandler(ctx *gin.Context) {
 	id, err := e.artistService.RemoveArtist(ctx, req.ID)
 	if err != nil {
 		if errors.Is(err, services.ErrArtistNotFound) {
-			_ = ctx.AbortWithError(http.StatusBadRequest, err)
+			_ = ctx.AbortWithError(http.StatusNotFound, err)
 			return
 		}
 

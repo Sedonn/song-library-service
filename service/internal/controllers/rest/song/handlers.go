@@ -21,6 +21,7 @@ import (
 //	@Param			pagination	query		GetSongRequestQuery	true	"Настройки пагинации. pageSize игнорируется."
 //	@Success		200			{object}	GetSongResponse
 //	@Failure		400			{object}	mwerror.ErrorResponse
+//	@Failure		404			{object}	mwerror.ErrorResponse
 //	@Failure		500			{object}	mwerror.ErrorResponse
 //	@Router			/songs/{song-id}/couplets [get]
 func (e *Endpoints) getSongCoupletsHandler(ctx *gin.Context) {
@@ -38,7 +39,7 @@ func (e *Endpoints) getSongCoupletsHandler(ctx *gin.Context) {
 	if err != nil {
 		switch {
 		case errors.Is(err, services.ErrSongNotFound):
-			_ = ctx.AbortWithError(http.StatusBadRequest, err)
+			_ = ctx.AbortWithError(http.StatusNotFound, err)
 
 		case errors.Is(err, services.ErrPageNumberOutOfRange):
 			_ = ctx.AbortWithError(http.StatusBadRequest, err)
@@ -100,6 +101,7 @@ func (e *Endpoints) searchSongsHandler(ctx *gin.Context) {
 //	@Param			song	body		CreateSongRequest	true	"Данные новой песни"
 //	@Success		200		{object}	CreateSongResponse
 //	@Failure		400		{object}	mwerror.ErrorResponse
+//	@Failure		404		{object}	mwerror.ErrorResponse
 //	@Failure		500		{object}	mwerror.ErrorResponse
 //	@Router			/songs/ [post]
 func (e *Endpoints) createSongHandler(ctx *gin.Context) {
@@ -118,7 +120,7 @@ func (e *Endpoints) createSongHandler(ctx *gin.Context) {
 	})
 	if err != nil {
 		if errors.Is(err, services.ErrArtistNotFound) {
-			_ = ctx.AbortWithError(http.StatusBadRequest, err)
+			_ = ctx.AbortWithError(http.StatusNotFound, err)
 			return
 		}
 
@@ -139,6 +141,7 @@ func (e *Endpoints) createSongHandler(ctx *gin.Context) {
 //	@Param			song	body		ChangeSongRequestBody	true	"Новые данные песни"
 //	@Success		200		{object}	ChangeSongResponse
 //	@Failure		400		{object}	mwerror.ErrorResponse
+//	@Failure		404		{object}	mwerror.ErrorResponse
 //	@Failure		500		{object}	mwerror.ErrorResponse
 //	@Router			/songs/{song-id} [patch]
 func (e *Endpoints) changeSongHandler(ctx *gin.Context) {
@@ -163,7 +166,7 @@ func (e *Endpoints) changeSongHandler(ctx *gin.Context) {
 	if err != nil {
 		switch {
 		case errors.Is(err, services.ErrArtistNotFound):
-			fallthrough
+			_ = ctx.AbortWithError(http.StatusNotFound, err)
 
 		case errors.Is(err, services.ErrSongNotFound):
 			_ = ctx.AbortWithError(http.StatusBadRequest, err)
@@ -187,6 +190,7 @@ func (e *Endpoints) changeSongHandler(ctx *gin.Context) {
 //	@Param			song-id	path		RemoveSongRequest	true	"ID песни"
 //	@Success		200		{object}	RemoveSongResponse
 //	@Failure		400		{object}	mwerror.ErrorResponse
+//	@Failure		404		{object}	mwerror.ErrorResponse
 //	@Failure		500		{object}	mwerror.ErrorResponse
 //	@Router			/songs/{song-id} [delete]
 func (e *Endpoints) removeSongHandler(ctx *gin.Context) {
@@ -199,7 +203,7 @@ func (e *Endpoints) removeSongHandler(ctx *gin.Context) {
 	s, err := e.songService.RemoveSong(ctx, req.ID)
 	if err != nil {
 		if errors.Is(err, services.ErrSongNotFound) {
-			_ = ctx.AbortWithError(http.StatusBadRequest, err)
+			_ = ctx.AbortWithError(http.StatusNotFound, err)
 			return
 		}
 
